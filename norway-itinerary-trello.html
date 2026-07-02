@@ -1,0 +1,1604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Norway Trip Itinerary</title>
+<style>
+  :root{
+    --col: 318px; --gap: 12px; --ink:#050505; --blue:#bdf8f4; --stay:#cdeeff;
+    --yellow:#ffffcf; --pink:#ffd6cc; --green:#ccffce; --peach:#ffd9c6; --mint:#c8ffd0;
+    --purple:#8997d8; --magenta:#f068ff; --orange:#ffad80; --border:5px solid var(--ink);
+    --radius:12px; --shadow:7px 7px 0 rgba(0,0,0,.14); --timeline-width:5000px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;background:white;color:var(--ink);font-family:Arial,Helvetica,sans-serif;font-weight:900}
+  body{display:flex;flex-direction:column}
+  .toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;padding:13px 16px 12px;border-bottom:var(--border);background:white;z-index:15}
+  h1{font-size:clamp(25px,3vw,43px);line-height:.9;letter-spacing:-1.5px;text-transform:uppercase;margin:0;outline:none}
+  .playhead-hud{position:absolute;top:12px;right:12px;z-index:30;width:330px;max-width:calc(100% - 24px);max-height:calc(100% - 24px);overflow-y:auto;background:rgba(255,255,255,.96);backdrop-filter:blur(3px);border:var(--border);border-radius:14px;box-shadow:6px 6px 0 rgba(0,0,0,.18);padding:8px 14px 10px;text-align:center}
+  .alt-times{display:none;margin-top:5px;flex-direction:column;gap:3px}
+  .alt-times.on{display:flex}
+  .alt-times .alt-time{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;text-transform:uppercase;letter-spacing:.3px;border:2px solid var(--ink);border-radius:7px;padding:3px 6px;background:rgba(255,255,255,.6)}
+  .alt-times .alt-place{font-size:9px;opacity:.6;letter-spacing:.5px}
+  .alt-times .alt-clock{margin-left:auto;font-size:12px}
+  .subtitle{font-size:17px;letter-spacing:.3px;text-transform:uppercase;opacity:.95;display:inline-flex;align-items:center;gap:8px;justify-content:center;background:none;border:0;box-shadow:none;padding:0}
+  .subtitle .sky-glyph{font-size:16px}
+  .status-panel{margin-top:8px;display:flex;flex-direction:column;gap:5px}
+  .status-line{height:27px;width:100%;padding:0;appearance:none;border:3px solid var(--ink);border-radius:8px;background:white;display:grid;grid-template-columns:82px 26px 1fr;align-items:center;text-align:left;overflow:hidden;box-shadow:2px 2px 0 rgba(0,0,0,.1);cursor:default}
+  button.status-line{cursor:pointer}
+  button.status-line:hover{transform:translateY(-1px);box-shadow:3px 3px 0 rgba(0,0,0,.14)}
+  .status-line .status-label{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;background:rgba(255,255,255,.55);border-right:3px solid var(--ink);height:100%;display:flex;align-items:center;padding:0 7px;white-space:nowrap;overflow:hidden}
+  .status-line .status-icon{font-size:14px;line-height:1;text-align:center}
+  .status-line .status-value{font-size:13px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px 0 5px}
+  .status-line.empty{border-style:dashed;border-color:rgba(5,5,5,.4);box-shadow:none}
+  .status-line.empty .status-label{border-right-style:dashed;border-right-color:rgba(5,5,5,.4);background:transparent;opacity:.5}
+  .status-line.empty .status-icon,.status-line.empty .status-value{opacity:.35}
+  .status-details{margin-top:7px;display:flex;flex-direction:column;gap:5px;max-height:190px;overflow-y:auto;text-align:left}
+  .detail-line{width:100%;appearance:none;border:3px solid var(--ink);border-radius:8px;background:white;box-shadow:2px 2px 0 rgba(0,0,0,.1);padding:6px 8px;display:flex;flex-direction:column;gap:3px;text-align:left;cursor:default}
+  button.detail-line{cursor:pointer}
+  button.detail-line:hover{transform:translateY(-1px);box-shadow:3px 3px 0 rgba(0,0,0,.14)}
+  .detail-line .detail-head{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.4px}
+  .detail-line .detail-icon{font-size:13px;line-height:1}
+  .detail-line .detail-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .detail-line .detail-body{font-size:11.5px;font-weight:700;line-height:1.35;white-space:normal;background:rgba(255,255,255,.55);border-radius:5px;padding:4px 6px}
+  .quick-title-overlay{position:fixed;inset:0;background:rgba(5,5,5,.35);display:flex;align-items:center;justify-content:center;z-index:90}
+  .quick-title-box{background:white;border:var(--border);border-radius:14px;box-shadow:8px 8px 0 rgba(0,0,0,.2);padding:14px 16px;display:flex;align-items:center;gap:10px}
+  .quick-title-box label{font-size:11px;text-transform:uppercase;opacity:.6;letter-spacing:.4px;flex:none}
+  .quick-title-input{border:4px solid var(--ink);border-radius:9px;padding:9px 11px;font:900 16px/1.1 Arial,Helvetica,sans-serif;min-width:240px;background:white;color:var(--ink)}
+  .quick-title-ok{width:38px;height:38px;font-size:19px}
+  .field.text-plain input,.field.text-plain textarea{border:0;border-bottom:3px solid transparent;border-radius:0;padding:4px 2px}
+  .field.text-plain input:hover,.field.text-plain textarea:hover{border-bottom-color:rgba(5,5,5,.25)}
+  .field.text-plain input:focus,.field.text-plain textarea:focus{border-bottom-color:var(--ink);outline:none}
+  .field.text-plain textarea{min-height:80px}
+  .mode-toggle{display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none;border:4px solid var(--ink);border-radius:14px;padding:6px 12px 6px 8px;background:white;box-shadow:3px 3px 0 rgba(0,0,0,.13)}
+  .mode-toggle input{display:none}
+  .mode-toggle .toggle-track{width:50px;height:27px;border:3px solid var(--ink);border-radius:999px;background:var(--pink);position:relative;transition:background .15s ease;flex:none}
+  .mode-toggle .toggle-thumb{position:absolute;top:1px;left:1px;width:19px;height:19px;background:var(--ink);border-radius:999px;transition:transform .15s ease}
+  .mode-toggle input:checked ~ .toggle-track{background:var(--green)}
+  .mode-toggle input:checked ~ .toggle-track .toggle-thumb{transform:translateX(23px)}
+  .mode-toggle .toggle-label{font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+  body.view-mode .gap-add,body.view-mode .mini-gap-add,body.view-mode .edge-add,body.view-mode .seg-slot,body.view-mode .seam-handle,body.view-mode .mini-seam,body.view-mode .mini-edit-btn,body.view-mode .handle,body.view-mode .mini-handle,body.view-mode #razorBtn,body.view-mode .undo-redo,body.view-mode .day-del{display:none!important}
+  .undo-redo{display:flex;gap:4px}
+  .zoom-ctrl{display:flex;gap:4px}
+  #zoomLabel{min-width:54px;text-align:center}
+  .undo-redo button:disabled{opacity:.3;cursor:not-allowed}
+  .undo-redo button:disabled:hover{transform:none}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+  button,.file-label{appearance:none;border:4px solid var(--ink);background:#fff;color:var(--ink);border-radius:11px;padding:9px 12px;font:900 12px/1 Arial,Helvetica,sans-serif;text-transform:uppercase;cursor:pointer;box-shadow:3px 3px 0 rgba(0,0,0,.13);user-select:none}
+  button:hover,.file-label:hover{transform:translateY(-1px)} button:active{transform:translateY(1px);box-shadow:1px 1px 0 rgba(0,0,0,.2)} button.active{background:var(--yellow)}
+  input[type=file]{display:none}
+  .wrap{flex:1 1 auto;display:flex;min-height:0;overflow:hidden}
+  .timeline-area{flex:1 1 auto;min-width:0;position:relative;overflow:hidden;background:linear-gradient(#fff 0 0) padding-box,repeating-linear-gradient(90deg,rgba(0,0,0,.03) 0 1px,transparent 1px 42px)}
+  .text-dock{display:none;flex:0 0 min(400px,42vw);min-height:0;border-left:var(--border);background:white;padding:12px;flex-direction:column;gap:9px}
+  .text-dock.open{display:flex}
+  .text-dock h2{font-size:24px;line-height:.9;letter-spacing:-.5px;text-transform:uppercase;margin:0}
+  .text-dock-head{display:flex;flex-direction:column;gap:3px;flex:none}
+  .text-dock-hint{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.4px;opacity:.55}
+  .text-dock .drawer-actions{flex:none}
+  .scroller{height:100%;overflow:auto;padding:26px 18px 34px;cursor:grab;scroll-behavior:smooth;scrollbar-color:var(--ink) #f5f5f5}
+  .scroller.dragging{cursor:grabbing;scroll-behavior:auto}.scroller::-webkit-scrollbar{height:22px;width:18px}.scroller::-webkit-scrollbar-track{background:#f5f5f5;border-top:4px solid var(--ink)}.scroller::-webkit-scrollbar-thumb{background:var(--ink);border-radius:999px;border:4px solid #f5f5f5}
+  .board{width:var(--timeline-width);position:relative;min-height:640px}
+  .date-ruler{position:relative;width:var(--timeline-width);height:86px;margin-bottom:10px;border-bottom:4px solid var(--ink)}
+  .month-band{position:absolute;top:0;height:18px;display:flex;align-items:center;padding-left:7px;font-size:11px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;background:var(--yellow);border:3px solid var(--ink);border-top:none;border-radius:0 0 8px 8px;overflow:hidden;white-space:nowrap;z-index:2}
+  .day-line{position:absolute;top:18px;bottom:0;width:0;border-left:3px solid var(--ink);z-index:1}
+  .day-label{position:absolute;top:20px;font-size:13px;font-weight:900;letter-spacing:.2px;white-space:nowrap;text-transform:uppercase;padding-left:6px;z-index:2}
+  .hour-line{position:absolute;bottom:0;width:0;height:12px;border-left:2px solid rgba(5,5,5,.28)}
+  .hour-line.major{height:24px;border-left:2px solid rgba(5,5,5,.55)}
+  .hour-label{position:absolute;top:38px;font-size:9px;font-weight:800;opacity:.55;letter-spacing:.2px;white-space:nowrap;padding-left:3px;z-index:2}
+  .sky-band{position:absolute;top:18px;bottom:0;pointer-events:none;z-index:0}
+  .sky-band.night{background:linear-gradient(to bottom,rgba(40,30,90,.13),rgba(40,30,90,.04))}
+  .sky-band.day{background:linear-gradient(to bottom,rgba(255,214,90,.16),rgba(255,214,90,.03))}
+  .sky-icon{position:absolute;top:64px;font-size:13px;line-height:1;pointer-events:none;z-index:2;transform:translateX(-50%)}
+  .act-marker{position:absolute;top:50px;height:9px;border:2px solid var(--ink);border-radius:5px;min-width:7px;padding:0;box-shadow:1px 1px 0 rgba(0,0,0,.18);cursor:pointer;opacity:.92;z-index:3;font-size:0;transition:transform .12s ease}
+  .act-marker:hover{transform:scaleY(1.6);opacity:1;z-index:4}
+  .act-marker.now{outline:2px solid var(--magenta);outline-offset:1px;opacity:1}
+  .playhead{position:absolute;left:50%;top:0;bottom:0;width:0;border-left:3px dashed var(--magenta);pointer-events:none;z-index:12}
+  .playhead .flag{position:absolute;top:-2px;left:-10px;width:23px;height:16px;background:var(--magenta);border:3px solid var(--ink);border-radius:0 0 7px 7px}
+  .bar-layer{position:relative;width:var(--timeline-width);height:70px;margin-bottom:12px;display:flex;align-items:center}
+  .stay-layer{position:relative;width:var(--timeline-width);margin:0 0 14px;display:flex;flex-direction:column}
+  #phLaneTags{position:absolute;left:50%;top:0;bottom:0;width:0;pointer-events:none;z-index:13}
+  .ph-lane-tag{position:absolute;right:13px;transform:translateY(-50%);display:inline-flex;align-items:center;gap:5px;border:3px solid var(--ink);border-radius:8px;padding:4px 8px;font:900 10px/1 Arial,Helvetica,sans-serif;letter-spacing:.6px;text-transform:uppercase;box-shadow:2px 2px 0 rgba(0,0,0,.16);white-space:nowrap;opacity:.95}
+  .ph-lane-tag .ph-lane-tag-icon{font-size:12px;line-height:1}
+  .bar{position:absolute;height:44px;border:var(--border);border-radius:12px;box-shadow:2px 2px 0 rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;text-align:center;padding:0 26px;overflow:hidden;cursor:default;user-select:none}.bar:hover{transform:translateY(-2px);box-shadow:6px 6px 0 rgba(0,0,0,.12);z-index:8}.bar-label{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:20px;letter-spacing:-.5px}.bar-sub{display:none}.bar.short .bar-label{font-size:13px}.staybar{height:66px;flex-direction:column;padding:8px 30px}.staybar .bar-label{font-size:20px}.staybar .bar-sub{display:block;margin-top:5px;font-size:11px;letter-spacing:.25px;text-transform:uppercase;opacity:.7;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}.handle{position:absolute;top:0;width:18px;height:100%;background:rgba(255,255,255,.15);border:0;box-shadow:none;padding:0;border-radius:0;cursor:ew-resize}.handle.left{left:0;border-right:4px solid var(--ink)}.handle.right{right:0;border-left:4px solid var(--ink)}.handle:before{content:"";position:absolute;top:11px;bottom:11px;left:6px;border-left:3px solid rgba(0,0,0,.55)}
+  .bar.movable{cursor:grab}.bar.moving{cursor:grabbing;opacity:.85;z-index:9}
+  .c-blue{background:var(--stay)}.c-yellow{background:var(--yellow)}.c-pink{background:var(--pink)}.c-green{background:var(--green)}.c-peach{background:var(--peach)}.c-mint{background:var(--mint)}.c-purple{background:var(--purple)}.c-magenta{background:var(--magenta)}.c-orange{background:var(--orange)}
+  .gap-add{position:absolute;border:4px dashed var(--ink);border-radius:10px;background:rgba(255,255,255,.55);color:var(--ink);font:900 20px/1 Arial,Helvetica,sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:.5;padding:0;box-shadow:none}
+  .gap-add:hover{opacity:1;background:var(--yellow);transform:none}
+  .gap-add .plus-hint,.mini-gap-add .plus-hint{pointer-events:none}
+  .gap-add.ghosting .plus-hint,.mini-gap-add.ghosting .plus-hint{opacity:.15}
+  .gap-add.ghosting{background:rgba(255,255,255,.3)}
+  .ghost-block{position:absolute;top:2px;bottom:2px;border:4px dashed var(--ink);border-radius:10px;background:rgba(255,255,207,.95);display:none;align-items:center;justify-content:center;pointer-events:none;z-index:2;overflow:hidden}
+  .ghost-block.on{display:flex}
+  .ghost-block .ghost-label{font-size:10px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 6px}
+  .ghost-block.v{left:2px;right:2px;top:auto;bottom:auto;border-width:3px;border-radius:7px}
+  .ghost-block.v .ghost-label{font-size:9px;white-space:normal;text-align:center;line-height:1.1;padding:0 3px}
+  .mini-gap-add.quiet{opacity:0}
+  .mini-gap-add.quiet:hover{opacity:1}
+  .seam-handle{position:absolute;width:22px;margin-left:-11px;background:transparent;border:0;box-shadow:none;padding:0;cursor:ew-resize;z-index:9}
+  .seam-handle:hover,.seam-handle:active{transform:none;box-shadow:none}
+  .seam-handle:after{content:'\2194';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:22px;height:22px;background:white;border:3px solid var(--ink);border-radius:7px;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:2px 2px 0 rgba(0,0,0,.18);opacity:.6}
+  .seam-handle:hover:after{opacity:1;background:var(--yellow)}
+  .mini-seam{position:absolute;height:16px;margin-top:-8px;background:transparent;border:0;box-shadow:none;padding:0;cursor:ns-resize;z-index:6}
+  .mini-seam:hover,.mini-seam:active{transform:none;box-shadow:none}
+  .mini-seam:after{content:'\2195';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:18px;height:18px;background:white;border:2px solid var(--ink);border-radius:6px;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:1px 1px 0 rgba(0,0,0,.18);opacity:.6}
+  .mini-seam:hover:after{opacity:1;background:var(--yellow)}
+  #dragTip{position:fixed;z-index:96;background:var(--ink);color:#fff;font:900 11px/1.15 Arial,Helvetica,sans-serif;padding:6px 9px;border-radius:8px;pointer-events:none;display:none;white-space:nowrap;box-shadow:3px 3px 0 rgba(0,0,0,.28)}
+  #dragTip.on{display:block}
+  body.resizing .gap-add,body.resizing .mini-gap-add,body.resizing .seg-slot,body.resizing .seam-handle,body.resizing .mini-seam,body.block-dragging .gap-add,body.block-dragging .mini-gap-add,body.block-dragging .seg-slot,body.block-dragging .seam-handle,body.block-dragging .mini-seam{pointer-events:none!important}
+  body.resizing .ghost-block,body.block-dragging .ghost-block{display:none!important}
+  body.block-dragging .mini-gap-add.quiet{opacity:0!important}
+  #razorLine{position:absolute;width:0;border-left:3px dashed var(--magenta);z-index:25;pointer-events:none;display:none}
+  .razor-hline{position:absolute;left:0;right:0;height:0;border-top:3px dashed var(--magenta);z-index:25;pointer-events:none}
+  body.razor-mode .bar,body.razor-mode .mini-block{cursor:crosshair!important}
+  body.razor-mode .handle,body.razor-mode .mini-handle,body.razor-mode .seam-handle,body.razor-mode .mini-seam,body.razor-mode .mini-edit-btn{display:none!important}
+  .edge-add{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:56px;border:4px solid var(--ink);border-radius:12px;background:white;font:900 22px/1 Arial,Helvetica,sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:.5;z-index:20;box-shadow:3px 3px 0 rgba(0,0,0,.15);padding:0}
+  .edge-add:hover{opacity:1;background:var(--yellow);transform:translateY(-50%)}
+  .edge-add.start{left:6px}.edge-add.end{right:6px}
+  .days{display:grid;grid-template-columns:repeat(var(--day-count),var(--col));gap:var(--gap);width:var(--timeline-width);align-items:start}
+  .day-card{position:relative;min-height:180px;border:var(--border);border-radius:var(--radius);background:white;overflow:hidden;box-shadow:3px 3px 0 rgba(0,0,0,.08);user-select:none}
+  .day-del{position:absolute;top:8px;right:8px;width:24px;height:24px;padding:0;font-size:12px;line-height:1;border-width:3px;border-radius:8px;box-shadow:none;opacity:.25;z-index:5;display:flex;align-items:center;justify-content:center}
+  .day-del:hover{opacity:1;background:var(--pink)}
+  .day-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+  .day-head{height:86px;display:flex;align-items:flex-start;justify-content:space-between;padding:0 9px;border-bottom:var(--border);cursor:pointer}
+  .date-num{font-family:Impact,"Arial Black",Arial,sans-serif;font-size:78px;line-height:.96;letter-spacing:-2px}
+  .weekday{font-size:13px;align-self:flex-end;margin-bottom:10px;letter-spacing:.3px;text-transform:uppercase;opacity:.64}
+  .mini-timeline{position:relative;background:var(--blue);margin:8px;border-radius:8px;width:calc(100% - 16px)}
+  .mini-timeline.compact{background:repeating-linear-gradient(to bottom, var(--blue) 0px, var(--blue) 71px, rgba(5,5,5,.05) 71px, rgba(5,5,5,.05) 72px)}
+  .mini-block{position:absolute;border:3px solid var(--ink);border-radius:7px;overflow:hidden;cursor:default;box-shadow:2px 2px 0 rgba(0,0,0,.11);display:flex;flex-direction:column;align-items:flex-start;justify-content:center}
+  .mini-block.selected{outline:3px solid var(--magenta);outline-offset:1px}
+  .mini-block.dragging{opacity:.35;filter:grayscale(.3)}
+  .mini-block.ghost-move{pointer-events:none;opacity:.9;border-style:dashed;box-shadow:0 0 0 3px rgba(240,104,255,.35),4px 4px 0 rgba(0,0,0,.14);z-index:8}
+  body.block-dragging .mini-block:not(.dragging):not(.ghost-move){transition:top .12s ease,left .12s ease}
+  body.block-dragging{cursor:grabbing}
+  .mini-block.now{outline:3px solid var(--magenta);outline-offset:2px;box-shadow:0 0 0 4px rgba(240,104,255,.28),3px 3px 0 rgba(0,0,0,.11);transform:scale(1.035);z-index:5;animation:nowPulse 1.6s ease-in-out infinite}
+  @keyframes nowPulse{0%,100%{box-shadow:0 0 0 4px rgba(240,104,255,.28),3px 3px 0 rgba(0,0,0,.11)}50%{box-shadow:0 0 0 8px rgba(240,104,255,.12),3px 3px 0 rgba(0,0,0,.11)}}
+  .mini-label{font-size:10px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 7px;pointer-events:none;max-width:100%}
+  .mini-label.editing{pointer-events:auto;outline:2px dashed var(--magenta);outline-offset:1px;cursor:text;white-space:normal;overflow:visible;user-select:text;background:white;z-index:6}
+  .mini-edit-btn{position:absolute;top:2px;right:2px;width:15px;height:15px;border:0;background:rgba(255,255,255,.8);border-radius:4px;font-size:9px;line-height:15px;text-align:center;padding:0;opacity:0;transition:opacity .15s ease;cursor:text;z-index:4;pointer-events:auto;box-shadow:none}
+  .mini-block:hover .mini-edit-btn{opacity:.65}
+  .mini-edit-btn:hover{opacity:1!important;background:var(--yellow)}
+  .mini-handle{position:absolute;left:0;right:0;height:7px;background:transparent;border:0;box-shadow:none;padding:0;border-radius:0;cursor:ns-resize}
+  .mini-handle.top{top:0}.mini-handle.bottom{bottom:0}
+  .mini-gap-add{position:absolute;border:2px dashed rgba(5,5,5,.5);border-radius:6px;background:rgba(255,255,255,.5);opacity:.4;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;box-shadow:none;color:var(--ink)}
+  .mini-gap-add:hover{opacity:1;background:var(--yellow)}
+  .seg-slot{position:absolute;border:3px dashed rgba(5,5,5,.35);border-radius:8px;background:rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;opacity:.55;padding:0;box-shadow:none;font:900 12px/1 Arial,Helvetica,sans-serif;color:var(--ink)}
+  .seg-slot:hover{opacity:1;background:var(--yellow);border-color:var(--ink)}
+  .seg-slot .seg-slot-icon{font-size:14px}
+  .seg-slot .seg-slot-plus{font-size:16px}
+  .icon-btn{width:30px;height:30px;padding:0;font-size:18px;line-height:1;border-width:3px;box-shadow:2px 2px 0 rgba(0,0,0,.13);display:inline-flex;align-items:center;justify-content:center}
+  .panel{position:fixed;right:18px;top:92px;width:min(560px,calc(100vw - 36px));max-height:calc(100vh - 114px);background:white;border:var(--border);border-radius:16px;box-shadow:11px 11px 0 rgba(0,0,0,.18);z-index:30;padding:16px;overflow:auto;transform:translateX(calc(100% + 50px));transition:transform .18s ease}.panel.open{transform:translateX(0)}.panel h2{font-size:34px;line-height:.9;letter-spacing:-.8px;text-transform:uppercase;margin:0 42px 7px 0;outline:none}.panel .close{position:absolute;right:12px;top:10px;padding:7px 10px;font-size:20px;line-height:.8}.field{display:grid;gap:5px;margin:10px 0}.field label{font-size:12px;text-transform:uppercase;opacity:.65;letter-spacing:.4px}.field input,.field select,.field textarea{border:4px solid var(--ink);border-radius:10px;padding:9px;font:900 14px/1.15 Arial,Helvetica,sans-serif;background:white;color:var(--ink);width:100%}.field textarea{min-height:105px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .palette{display:flex;flex-wrap:wrap;gap:8px}
+  .swatch{width:34px;height:34px;padding:0;border:4px solid var(--ink);border-radius:10px;box-shadow:2px 2px 0 rgba(0,0,0,.13);cursor:pointer;position:relative}
+  .swatch:hover{transform:translateY(-2px)}
+  .swatch.selected{outline:3px solid var(--ink);outline-offset:2px}
+  .swatch.selected:after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:var(--ink);text-shadow:0 0 4px #fff,0 0 4px #fff}
+  .mode-swatch{width:36px;height:36px;padding:0;border:4px solid var(--ink);border-radius:10px;background:white;box-shadow:2px 2px 0 rgba(0,0,0,.13);cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center}
+  .mode-swatch:hover{transform:translateY(-2px)}
+  .mode-swatch.selected{background:var(--yellow);outline:3px solid var(--ink);outline-offset:2px}
+  .drawer{position:fixed;left:18px;top:92px;bottom:22px;width:min(680px,calc(100vw - 36px));background:white;border:var(--border);border-radius:16px;box-shadow:11px 11px 0 rgba(0,0,0,.18);z-index:35;padding:14px;display:none;grid-template-rows:auto 1fr auto;gap:10px}.drawer.open{display:grid}.drawer h2{font-size:32px;line-height:.9;letter-spacing:-.8px;text-transform:uppercase;margin:0}.drawer textarea{width:100%;height:100%;border:4px solid var(--ink);border-radius:12px;padding:12px;font:800 12px/1.35 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;resize:none}.drawer-actions{display:flex;flex-wrap:wrap;gap:8px}.drawer-actions input{flex:1;min-width:160px;border:4px solid var(--ink);border-radius:10px;padding:9px;font:900 13px/1.15 Arial,Helvetica,sans-serif}
+  .text-view{position:relative;width:100%;flex:1 1 auto;min-height:0;border:4px solid var(--ink);border-radius:12px;padding:10px 12px;font:800 12px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow:auto;background:white;user-select:text;cursor:text}
+  .text-view .tv-line{white-space:pre-wrap;padding:1px 7px;border-radius:6px;border-left:4px solid transparent}
+  .text-view .tv-line.tv-day{margin-top:6px;font-size:13px;letter-spacing:.4px}
+  .text-view .tv-line.tv-current-day{background:var(--yellow);border-left-color:var(--ink)}
+  .text-view .tv-line.tv-active{background:rgba(240,104,255,.2);border-left-color:var(--magenta)}
+  .text-view .tv-line.tv-active::after{content:' \25C0 NOW';color:var(--magenta);font-size:9px;letter-spacing:.6px}
+  .actions-list{overflow:auto;display:grid;gap:8px;align-content:start}.action-item{display:flex;align-items:center;gap:9px;border:4px solid var(--ink);border-radius:10px;padding:8px 10px;background:white}.action-item.dragging{opacity:.35}.action-item.done .action-text{text-decoration:line-through;opacity:.5}.action-item input[type=checkbox]{width:19px;height:19px;flex:none}.action-item .action-text{flex:1;outline:none;font-size:14px;line-height:1.25;cursor:text}.action-item .card-handle{margin-bottom:0}
+  .card-handle{cursor:grab;font-size:12px;letter-spacing:2px;opacity:.4;user-select:none;text-transform:uppercase}.card-handle:active{cursor:grabbing}
+  .small-btn{padding:6px 8px;border-width:3px;font-size:10px;box-shadow:2px 2px 0 rgba(0,0,0,.13)}
+  .toast{position:fixed;left:18px;bottom:18px;background:var(--yellow);border:var(--border);border-radius:12px;padding:11px 14px;z-index:80;font-size:14px;box-shadow:6px 6px 0 rgba(0,0,0,.16);display:none}.toast.show{display:block}.note{border:4px solid var(--ink);border-radius:12px;background:var(--yellow);padding:10px;font-size:14px;line-height:1.2;text-transform:none}
+  .dialog-overlay{position:fixed;inset:0;background:rgba(5,5,5,.55);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
+  .dialog-overlay.open{display:flex}
+  .dialog{background:white;border:var(--border);border-radius:16px;box-shadow:11px 11px 0 rgba(0,0,0,.25);width:min(820px,100%);max-height:90vh;overflow:auto;padding:18px 20px 20px}
+  .dialog-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .dialog-head h2{font-size:26px;text-transform:uppercase;letter-spacing:-.5px;margin:0}
+  .dialog-timeline-wrap{display:flex;gap:10px;align-items:flex-start;max-height:min(64vh,620px);overflow-y:auto;padding-bottom:8px;margin-bottom:14px}
+  .dialog-ruler{position:relative;width:52px;flex:none}
+  .dialog-ruler .dtick{position:absolute;left:0;right:0;border-top:2px solid rgba(5,5,5,.3);font-size:9px;font-weight:800;padding-top:3px;opacity:.6;white-space:nowrap}
+  .mini-timeline.dialog-mini{min-height:70px;margin:0;width:auto;flex:none}
+  .mini-timeline.dialog-mini .mini-label{font-size:12px;padding:0 10px}
+  .dialog-edit{border-top:3px solid rgba(5,5,5,.15);padding-top:14px}
+  body.resizing{cursor:ew-resize} body.resizing *{user-select:none!important}.muted{opacity:.66}
+  @media(max-width:720px){:root{--col:280px;--gap:10px}.toolbar{align-items:flex-start;flex-direction:column}.controls{justify-content:flex-start}.date-num{font-size:68px}.panel{top:150px}.drawer{top:150px}.text-dock{flex-basis:min(340px,80vw)}}
+  @media print{
+    html,body{height:auto;overflow:visible}
+    .toolbar,.timeline-area,.panel,.drawer,.toast,.dialog-overlay,#dragTip{display:none!important}
+    .wrap{overflow:visible;display:block}
+    .text-dock{display:block!important;width:100%;border:0;padding:0}
+    .text-dock .drawer-actions,.text-dock-hint{display:none!important}
+    .text-view{border:0;overflow:visible;height:auto;flex:none}
+    .text-view .tv-line.tv-active::after{content:''}
+  }
+</style>
+</head>
+<body>
+<header class="toolbar">
+  <div class="title-wrap">
+    <h1 id="tripTitle" contenteditable="true"></h1>
+  </div>
+  <div class="controls">
+    <label class="mode-toggle" for="editModeToggle"><input type="checkbox" id="editModeToggle" checked><span class="toggle-track"><span class="toggle-thumb"></span></span><span class="toggle-label">Edit Mode</span></label>
+    <div class="undo-redo"><button id="undoBtn" title="Undo (Ctrl/Cmd+Z)">↶ Undo</button><button id="redoBtn" title="Redo (Ctrl/Cmd+Shift+Z)">↷ Redo</button></div>
+    <div class="zoom-ctrl"><button id="zoomOutBtn" title="Zoom out (Ctrl/Cmd −, or Ctrl/Cmd + scroll)">−</button><button id="zoomLabel" title="Reset zoom to 100% (Ctrl/Cmd 0)">100%</button><button id="zoomInBtn" title="Zoom in (Ctrl/Cmd +, or Ctrl/Cmd + scroll)">+</button></div><button id="nowBtn" title="Jump the playhead to the current time">◉ Now</button><button id="homeTimesBtn" title="Also show Florida (Eastern) & Santa Cruz (Pacific) time">🏠 Home Times</button><button id="razorBtn" title="Razor — click a block to slice it in two (Esc to exit)">✂ Razor</button><button id="leftBtn">← Left</button><button id="rightBtn">Right →</button><button id="dataBtn">Raw Data</button><button id="actionsBtn">Action Items</button><button id="textViewBtn">Text View</button><button id="saveLocalBtn">Save Local</button><button id="downloadBtn">Download JSON</button><label class="file-label" for="uploadInput">Upload JSON</label><input id="uploadInput" type="file" accept="application/json,.json"><button id="resetBtn">Reset Example</button>
+  </div>
+</header>
+<main class="wrap"><div class="timeline-area" id="timelineArea"><div class="playhead-hud" id="playheadHud"><div class="subtitle" id="tripSubtitle">—</div><div class="alt-times" id="altTimes"></div><div class="status-panel" id="playheadStatus"></div></div><button class="edge-add start" id="addDayStartBtn" title="Add a day before the trip start">+</button><div class="playhead" id="playhead"><div class="flag"></div></div><section class="scroller" id="scroller"><div class="board" id="board"><div class="date-ruler" id="dateRuler"></div><div class="bar-layer" id="locationLayer"></div><div class="bar-layer" id="transportLayer"></div><div class="stay-layer" id="stayLayer"></div><div class="days" id="days"></div></div></section><button class="edge-add end" id="addDayEndBtn" title="Add a day after the trip end">+</button></div><aside class="text-dock" id="textDrawer"><div class="text-dock-head"><h2>Text View</h2><span class="text-dock-hint">Follows the playhead — scroll the text to pause it</span></div><div id="textViewArea" class="text-view"></div><div class="drawer-actions"><button id="copyTextBtn">Copy</button><button id="downloadTextBtn">Download .txt</button><button id="printTextBtn">Print</button><button class="icon-btn" id="closeTextBtn" title="Close">×</button></div></aside></main>
+<aside class="panel" id="panel"><button class="close" id="closePanel">×</button><h2 id="panelTitle" contenteditable="true"></h2><div id="panelForm"></div></aside>
+<section class="drawer" id="drawer"><div><h2>Raw itinerary data</h2><div class="note">Edit the JSON here, then press Apply. This is the source of truth for dates, blocks, stays, day cards, and action items. Everything lives in this one HTML file — no backend, autosaves to this browser via localStorage. Use Download JSON as a portable backup, or to move your data into a fresh copy of this file.</div></div><textarea id="rawText" spellcheck="false"></textarea><div class="drawer-actions"><button id="applyRawBtn">Apply Text to UI</button><button id="formatRawBtn">Format JSON</button><button id="closeDrawerBtn">Close</button></div></section>
+<section class="drawer" id="actionsDrawer"><div><h2>Trip Action Items</h2><div class="note">Trip-wide to-dos that aren't tied to one day — drag the ⠿ handle to reprioritize, check off when done.</div></div><div class="actions-list" id="actionsList"></div><div class="drawer-actions"><input id="newActionText" placeholder="Add an action item…"><button class="icon-btn" id="addActionBtn" title="Add action item">+</button><button id="closeActionsBtn">Close</button></div></section>
+<div class="dialog-overlay" id="dayDialogOverlay"><div class="dialog" id="dayDialog"><div class="dialog-head"><h2 id="dayDialogTitle">—</h2><button class="close icon-btn" id="closeDayDialogBtn" title="Close">×</button></div><div class="dialog-timeline-wrap"><div class="dialog-ruler" id="dialogRuler"></div><div class="mini-timeline dialog-mini" id="dialogTimeline"></div></div><div class="dialog-edit" id="dialogEditForm"><div class="muted">Select an activity above to edit it, or use the + in an open slot to add one.</div></div></div></div>
+<div class="toast" id="toast"></div>
+<script>
+const TRANSPORT_MODES = [
+  { key: 'plane', icon: '✈', label: 'Flight' },
+  { key: 'boat', icon: '⛴', label: 'Boat / Ferry' },
+  { key: 'train', icon: '🚆', label: 'Train' },
+  { key: 'bus', icon: '🚌', label: 'Bus' },
+  { key: 'car', icon: '🚗', label: 'Car / Taxi' },
+  { key: 'bike', icon: '🚲', label: 'Bike' },
+  { key: 'walk', icon: '🚶', label: 'Walk' }
+];
+const MODE_ICON = Object.fromEntries(TRANSPORT_MODES.map(m => [m.key, m.icon]));
+const MODE_LABEL = Object.fromEntries(TRANSPORT_MODES.map(m => [m.key, m.label]));
+const TRANSPORT_VERB = { plane:'Flying', boat:'Cruising', train:'On the train', bus:'On the bus', car:'Driving', bike:'Biking', walk:'Walking' };
+const DAY_SEGMENTS = {
+  morning:{start:'08:00', end:'12:00', icon:'🌅', label:'Morning'},
+  afternoon:{start:'12:00', end:'17:00', icon:'☀️', label:'Afternoon'},
+  night:{start:'19:00', end:'22:00', icon:'🌙', label:'Night'}
+};
+const DEFAULT_DATA = {
+  version: 1,
+  title: "Norway Trip Itinerary",
+  tripStart: "2026-07-08T00:00",
+  tripEnd: "2026-07-23T00:00",
+  quantMinutes: 30,
+  locations: [
+    { id: "loc-bergen", name: "BERGEN", start: "2026-07-09T13:25", end: "2026-07-11T20:30", color: "yellow", details: "Arrive Bergen, check into Airbnb at Munkebotn 49. July 10: explore Fløyen & Granbakken Lake. Board Havila July 11 at 16:00; ship departs 20:30." },
+    { id: "loc-elverum", name: "Elverum Forest Retreat", start: "2026-07-18T08:00", end: "2026-07-19T11:30", color: "green", details: "Bus Oslo Airport → Elverum, 08:00–11:30 window, every 30 min. Norwegian Forestry Museum 10:00–16:00. Overnight in museum cabin, Solørvegen 151." },
+    { id: "loc-oslo", name: "OSLO", start: "2026-07-19T11:30", end: "2026-07-22T10:00", color: "yellow", details: "Bus back to Oslo, 08:00–11:30 window. Check into Airbnb at Herslebs gate 19 (confirm host meeting time — see Action Items). Sightseeing, thrifting, Frognerseteren day trip July 21." }
+  ],
+  transport: [
+    { id: "trn-outbound", name: "SFO → AMS → Bergen", mode: "plane", start: "2026-07-08T13:45", end: "2026-07-09T13:25", color: "peach", details: "KL0606 SFO→AMS 1:45 PM–9:05 AM (overnight). KL1167 AMS→BGO 11:45 AM–1:25 PM. Ref XPYR5S." },
+    { id: "trn-voyage", name: "Havila Voyage North", mode: "boat", start: "2026-07-11T20:30", end: "2026-07-17T09:00", color: "purple", details: "Coastal route: Ålesund (Geiranger/Trollstigen excursion), Trondheim, Bodø, Tromsø, Honningsvåg (North Cape ATV safari), arriving Kirkenes July 17 at 09:00." },
+    { id: "trn-kirkenes", name: "Kirkenes → Oslo Airport", mode: "plane", start: "2026-07-17T09:00", end: "2026-07-18T08:00", color: "mint", details: "09:00 dock. 11:00 leave ship, bags to Scandic Kirkenes (confirm storage policy — see Action Items). 13:00 Husky Hike. 15:15 Grenselandmuseet. SK4479 KKN→OSL 20:45–22:55, Ref XQKWVA. 23:25 shuttle to Scandic Gardermoen, booking ref 260630321651." },
+    { id: "trn-return", name: "Return Flights", mode: "plane", start: "2026-07-22T12:50", end: "2026-07-22T23:55", color: "peach", details: "Metro + Flytoget to OSL. AY914 OSL→HEL 12:50–15:15. AA8987 HEL→ORD 16:25–17:50, Ref CHSWDD. AA3054 ORD→SFO 21:13–23:55, Ref OPTAUR." }
+  ],
+  stays: [
+    { id: "s-bergen", name: "Bergen Airbnb", start: "2026-07-09T13:25", end: "2026-07-11T16:00", color: "green", address: "Munkebotn 49, Bergen", details: "Base until ship boarding at 16:00." },
+    { id: "s-havila", name: "Havila Ship Cabin", start: "2026-07-11T16:00", end: "2026-07-17T11:00", color: "blue", address: "Havila Voyages", details: "Board 16:00 July 11 in Bergen. Disembark ~11:00 July 17 in Kirkenes." },
+    { id: "s-kirkenes", name: "Scandic Kirkenes (bags)", start: "2026-07-17T11:00", end: "2026-07-17T19:30", color: "peach", address: "Scandic Kirkenes", details: "Bag storage while ashore — confirm policy. Husky Hike pickup 13:00, collect bags before airport transfer." },
+    { id: "s-gardermoen", name: "Scandic Gardermoen", start: "2026-07-17T23:25", end: "2026-07-18T08:00", color: "pink", address: "Oslo Airport hotel", details: "Shuttle ~23:25. Booking ref 260630321651." },
+    { id: "s-elverum", name: "Museum Cabin", start: "2026-07-18T16:00", end: "2026-07-19T08:00", color: "green", address: "Solørvegen 151, 2407 Elverum", details: "After Forestry Museum day." },
+    { id: "s-oslo", name: "Oslo Airbnb", start: "2026-07-19T14:00", end: "2026-07-22T10:00", color: "yellow", address: "Herslebs gate 19, 0561 Oslo", details: "Base through departure morning. Confirm host meeting/check-in instructions." }
+  ],
+  actionItems: [
+    { id: "a-1", text: "Confirm luggage storage policy with Scandic Kirkenes", done: false },
+    { id: "a-2", text: "Pre-book airport taxi via Scandic Kirkenes front desk", done: false },
+    { id: "a-3", text: "Confirm bus schedule & tickets for the Oslo–Elverum route", done: false },
+    { id: "a-4", text: "Finalize Oslo Airbnb host check-in meeting instructions", done: false }
+  ],
+  dayCards: [
+    { date: "2026-07-08", cards: [ { id: "c-0708-1", title: "Prep", body: "Passports, chargers, layers, snacks, water bottle.", start: "2026-07-08T09:00", end: "2026-07-08T11:00", color: "blue" }, { id: "c-0708-2", title: "Flight day", body: "KL0606 SFO → AMS. Depart 1:45 PM. Ref XPYR5S.", start: "2026-07-08T12:30", end: "2026-07-08T13:45", color: "peach" } ] },
+    { date: "2026-07-09", cards: [ { id: "c-0709-1", title: "Arrive Bergen", body: "Land AMS 9:05 AM. KL1167 AMS→BGO 11:45 AM–1:25 PM. Check into Airbnb at Munkebotn 49.", start: "2026-07-09T09:00", end: "2026-07-09T14:00", color: "yellow" } ] },
+    { date: "2026-07-10", cards: [ { id: "c-0710-1", title: "Explore Bergen", body: "Fløyen, Granbakken Lake — easy first full day.", start: "2026-07-10T10:00", end: "2026-07-10T17:00", color: "yellow" } ] },
+    { date: "2026-07-11", cards: [ { id: "c-0711-1", title: "Board Havila", body: "Boarding 16:00. Ship departs Bergen 20:30.", start: "2026-07-11T15:30", end: "2026-07-11T20:30", color: "purple" } ] },
+    { date: "2026-07-12", cards: [ { id: "c-0712-1", title: "Ålesund", body: "Arrive 09:45, depart 20:00. Geiranger & Trollstigen excursion.", start: "2026-07-12T09:45", end: "2026-07-12T20:00", color: "purple" } ] },
+    { date: "2026-07-13", cards: [ { id: "c-0713-1", title: "Trondheim", body: "Arrive 09:45, depart 12:45.", start: "2026-07-13T09:45", end: "2026-07-13T12:45", color: "purple" } ] },
+    { date: "2026-07-14", cards: [ { id: "c-0714-1", title: "Bodø", body: "Arrive 13:05, depart 15:20.", start: "2026-07-14T13:05", end: "2026-07-14T15:20", color: "purple" } ] },
+    { date: "2026-07-15", cards: [ { id: "c-0715-1", title: "Tromsø", body: "Arrive 14:15, depart 18:15.", start: "2026-07-15T14:15", end: "2026-07-15T18:15", color: "purple" } ] },
+    { date: "2026-07-16", cards: [ { id: "c-0716-1", title: "Honningsvåg / North Cape", body: "Arrive 10:55, depart 14:30. Guided ATV safari to the North Cape.", start: "2026-07-16T10:55", end: "2026-07-16T14:30", color: "purple" } ] },
+    { date: "2026-07-17", cards: [ { id: "c-0717-1", title: "Kirkenes logistics", body: "Dock 09:00. Bags to Scandic ~11:00 (confirm storage). 13:00 Husky Hike. 15:15 Grenselandmuseet. SK4479 KKN→OSL 20:45–22:55, Ref XQKWVA.", start: "2026-07-17T09:00", end: "2026-07-17T19:00", color: "mint" }, { id: "c-0717-2", title: "Late night", body: "Land Oslo 22:55. Shuttle to Scandic Gardermoen ~23:25, Ref 260630321651.", start: "2026-07-17T20:45", end: "2026-07-17T23:25", color: "mint" } ] },
+    { date: "2026-07-18", cards: [ { id: "c-0718-1", title: "Elverum", body: "Morning bus, Oslo Airport → Elverum (08:00–11:30 window). Forestry Museum 10:00–16:00. Check into museum cabin.", start: "2026-07-18T08:00", end: "2026-07-18T16:00", color: "green" } ] },
+    { date: "2026-07-19", cards: [ { id: "c-0719-1", title: "Back to Oslo", body: "Morning bus, Elverum → Oslo (08:00–11:30 window). Meet Airbnb host — time TBD. Check into Herslebs gate 19.", start: "2026-07-19T08:00", end: "2026-07-19T14:00", color: "yellow" } ] },
+    { date: "2026-07-20", cards: [ { id: "c-0720-1", title: "Oslo", body: "Sightseeing and thrifting.", start: "2026-07-20T10:00", end: "2026-07-20T18:00", color: "yellow" } ] },
+    { date: "2026-07-21", cards: [ { id: "c-0721-1", title: "Frognerseteren", body: "Day trip. Final Oslo night.", start: "2026-07-21T10:00", end: "2026-07-21T17:00", color: "yellow" } ] },
+    { date: "2026-07-22", cards: [ { id: "c-0722-1", title: "Return home", body: "Metro + Flytoget to OSL. AY914 OSL→HEL 12:50 PM, Ref CHSWDD. AA8987 HEL→ORD 4:25 PM. AA3054 ORD→SFO 9:13 PM, Ref OPTAUR.", start: "2026-07-22T09:00", end: "2026-07-22T23:55", color: "peach" } ] }
+  ]
+};
+// Bumped to v2 to force a clean reload of the original itinerary below, discarding whatever
+// got tangled up in browser storage from earlier testing/edits.
+const STORAGE_KEY = 'editableTripTimeline.v2';
+let data = loadInitialData();
+let activeEdit = null;
+let dragState = null;
+let moveState = null;
+let miniDragState = null;
+let showHomeTimes = false;
+let clickSuppress = false;
+let dayDialogDate = null;
+let dayDialogSelectedId = null;
+let historyStack = [];
+let redoStack = [];
+const COMPACT_DAY_PX = 432;
+const DIALOG_DAY_PX = 624;
+const DIALOG_LANE_PX = 320;
+const $ = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+const DAY = 24*60*60*1000;
+const COLORS = ['blue','yellow','pink','green','peach','mint','purple','magenta','orange'];
+function uid(prefix='id'){return prefix+'-'+Math.random().toString(36).slice(2,9)}
+function parseDate(value){return new Date(value)}
+function fmtDate(dt){const d=new Date(dt); const pad=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
+function fmtDateTime(dt){const d=new Date(dt); const pad=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`}
+function prettyDate(value){const d=parseDate(value); return d.toLocaleDateString(undefined,{month:'short',day:'numeric'})}
+function prettyTime(value){const d=parseDate(value); return d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}
+function prettyWindow(a,b){return `${prettyDate(a)} ${prettyTime(a)} → ${prettyDate(b)} ${prettyTime(b)}`}
+function escapeHtml(str=''){return String(str).replace(/[&<>"']/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[s]))}
+function loadInitialData(){try{const saved=localStorage.getItem(STORAGE_KEY); if(saved) return JSON.parse(saved)}catch(e){} return structuredClone(DEFAULT_DATA)}
+function assignLanes(items){
+  const sorted=[...items].sort((a,b)=>parseDate(a.start)-parseDate(b.start));
+  sorted.forEach(item=>{
+    if(item.lane==null){
+      let lane=0;
+      while(sorted.some(o=>o!==item && o.lane===lane && parseDate(o.start)<parseDate(item.end) && parseDate(item.start)<parseDate(o.end))) lane++;
+      item.lane=lane;
+    }
+  });
+}
+function findFreeLaneIn(items, startDate, endDate, excludeId){
+  let lane=0;
+  while(items.some(o=>o.id!==excludeId && (o.lane||0)===lane && parseDate(o.start)<endDate && startDate<parseDate(o.end))) lane++;
+  return lane;
+}
+// Fully reassigns lanes from scratch (unlike assignLanes, which only fills in nulls). Only call this
+// at drag-end / commit points, never during an active drag frame — otherwise blocks would "pop" between
+// lanes mid-drag. Fixes items getting permanently stuck in a lane they no longer need (e.g. a card that
+// briefly overlapped another during a drag, then got moved apart again, previously stayed split forever).
+function compactLanes(items){
+  const sorted=[...items].sort((a,b)=>parseDate(a.start)-parseDate(b.start));
+  sorted.forEach(item=>{ item.lane=null; });
+  sorted.forEach(item=>{
+    let lane=0;
+    while(sorted.some(o=>o!==item && o.lane===lane && parseDate(o.start)<parseDate(item.end) && parseDate(item.start)<parseDate(o.end))) lane++;
+    item.lane=lane;
+  });
+}
+function normalizeData(d){
+  d.version ||= 1; d.title ||= 'Trip Itinerary'; d.quantMinutes ||= 30;
+  if(d.places && !d.locations && !d.transport){ d.locations = d.places; } // migrate pre-lane-split schema
+  d.locations ||= []; d.transport ||= []; d.stays ||= []; d.dayCards ||= []; d.actionItems ||= [];
+  delete d.places;
+  d.transport.forEach(t=>{ t.mode ||= 'plane'; });
+  assignLanes(d.stays);
+  d.dayCards.forEach(day=>{
+    day.cards.forEach(c=>{ if(!c.start) c.start=day.date+'T09:00'; if(!c.end) c.end=day.date+'T10:00'; c.color ||= 'blue'; });
+  });
+  // Re-bucket any activity whose start date no longer matches its day card (e.g. after editing
+  // the date in the block editor). Day cards, ruler markers, the status HUD and the text view all
+  // key off these buckets, so a stale bucket makes them disagree about which day an event is on.
+  const rebucket=[];
+  d.dayCards.forEach(day=>{
+    for(let i=day.cards.length-1;i>=0;i--){
+      const c=day.cards[i];
+      if(isNaN(parseDate(c.start))) continue;
+      if(fmtDate(c.start)!==day.date){ day.cards.splice(i,1); rebucket.push(c); }
+    }
+  });
+  rebucket.forEach(c=>{
+    const date=fmtDate(c.start);
+    let day=d.dayCards.find(x=>x.date===date);
+    if(!day){ day={date,cards:[]}; d.dayCards.push(day); }
+    c.lane=null; day.cards.push(c);
+  });
+  d.dayCards.sort((a,b)=>a.date<b.date?-1:1);
+  d.dayCards.forEach(day=>assignLanes(day.cards));
+  return d;
+}
+function saveLocal(show=true){normalizeData(data); localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); syncRaw(); refreshTextView(); if(show) toast('Saved locally in this browser.');}
+function buildTextLines(){
+  const lines=[]; const {start,days}=getTrip();
+  lines.push({text:data.title});
+  lines.push({text:`${prettyDate(data.tripStart)} – ${prettyDate(new Date(parseDate(data.tripEnd).getTime()-1))}`});
+  lines.push({text:'='.repeat(44)});
+  for(let i=0;i<days;i++){
+    const dayStart=new Date(start.getTime()+i*DAY), dayEnd=new Date(dayStart.getTime()+DAY);
+    const date=fmtDate(dayStart);
+    lines.push({text:''});
+    lines.push({text:dayStart.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'}).toUpperCase(), cls:'tv-day', date});
+    const activeLocations=data.locations.filter(p=>parseDate(p.start)<dayEnd && parseDate(p.end)>dayStart);
+    const activeTransport=data.transport.filter(t=>parseDate(t.start)<dayEnd && parseDate(t.end)>dayStart);
+    const activeStays=data.stays.filter(s=>parseDate(s.start)<dayEnd && parseDate(s.end)>dayStart);
+    if(activeLocations.length){ activeLocations.forEach(p=>lines.push({text:`  Location: ${p.name} (${prettyWindow(p.start,p.end)})`, start:p.start, end:p.end, day:date})); } else { lines.push({text:'  Location: — none scheduled —'}); }
+    activeTransport.forEach(t=>lines.push({text:`  Transport [${MODE_LABEL[t.mode]||'—'}]: ${t.name} (${prettyWindow(t.start,t.end)})`, start:t.start, end:t.end, day:date}));
+    if(activeStays.length){ activeStays.forEach(s=>lines.push({text:`  Lodging: ${s.name}${s.address?' — '+s.address:''} (${prettyWindow(s.start,s.end)})`, start:s.start, end:s.end, day:date})); } else { lines.push({text:'  Lodging: — none booked —'}); }
+    const day=data.dayCards.find(x=>x.date===date);
+    if(day && day.cards.length){
+      lines.push({text:'  Activities:'});
+      [...day.cards].sort((a,b)=>parseDate(a.start)-parseDate(b.start)).forEach(c=>lines.push({text:`    - ${prettyTime(c.start)}–${prettyTime(c.end)} ${c.title}${c.body?': '+c.body:''}`, start:c.start, end:c.end, day:date}));
+    }
+  }
+  if(data.actionItems.length){
+    lines.push({text:''}); lines.push({text:'='.repeat(44)}); lines.push({text:'ACTION ITEMS'});
+    data.actionItems.forEach(a=>lines.push({text:`  [${a.done?'x':' '}] ${a.text}`}));
+  }
+  return lines;
+}
+function buildText(){return buildTextLines().map(l=>l.text).join('\n')}
+let tvPauseUntil=0, tvLastScrollKey=null;
+function currentPlayheadTime(){
+  const scroller=$('#scroller');
+  if(!scroller||!scroller.clientWidth) return parseDate(data.tripStart);
+  const padLeft=parseFloat(getComputedStyle(scroller).paddingLeft)||0;
+  return timeForX(Math.max(0, scroller.scrollLeft + scroller.clientWidth/2 - padLeft));
+}
+function refreshTextView(){
+  const ta=$('#textViewArea'); const drawer=$('#textDrawer');
+  if(!ta || !drawer || !drawer.classList.contains('open')) return;
+  const st=ta.scrollTop;
+  ta.innerHTML=buildTextLines().map(l=>{
+    const attrs=(l.start?` data-start="${l.start}" data-end="${l.end}"`:'')+(l.day?` data-day="${l.day}"`:'')+(l.date?` data-date="${l.date}"`:'');
+    return `<div class="tv-line${l.cls?' '+l.cls:''}"${attrs}>${escapeHtml(l.text)||'&nbsp;'}</div>`;
+  }).join('');
+  ta.scrollTop=st;
+  tvLastScrollKey=null;
+  highlightTextView(currentPlayheadTime());
+}
+// Highlights the day header + every line whose time range contains the playhead, and (unless the
+// user scrolled the text themselves in the last few seconds) keeps the highlighted line centered.
+function highlightTextView(dt){
+  const ta=$('#textViewArea'); const drawer=$('#textDrawer');
+  if(!ta || !drawer || !drawer.classList.contains('open')) return;
+  const dateStr=fmtDate(dt);
+  let firstActive=null, dayHeader=null;
+  $$('.tv-line', ta).forEach(el=>{
+    let active=false;
+    if(el.dataset.start){
+      active=parseDate(el.dataset.start)<=dt && dt<parseDate(el.dataset.end);
+      if(active && el.dataset.day && el.dataset.day!==dateStr) active=false; // multi-day blocks: only under today's header
+    }
+    el.classList.toggle('tv-active', active);
+    if(active && !firstActive) firstActive=el;
+    if(el.dataset.date){
+      const isCur=el.dataset.date===dateStr;
+      el.classList.toggle('tv-current-day', isCur);
+      if(isCur) dayHeader=el;
+    }
+  });
+  const target=firstActive||dayHeader;
+  if(!target) return;
+  if(Date.now()<tvPauseUntil) return; // user is reading elsewhere — don't fight their scroll
+  const key=dateStr+'|'+target.textContent;
+  if(key===tvLastScrollKey) return; // only move when the highlighted line actually changes
+  tvLastScrollKey=key;
+  ta.scrollTo({top: Math.max(0, target.offsetTop - ta.clientHeight/2 + target.offsetHeight/2), behavior:'smooth'});
+}
+function toast(msg){const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),2600)}
+function promptQuickTitle(defaultValue, onConfirm){
+  const overlay=document.createElement('div'); overlay.className='quick-title-overlay';
+  overlay.innerHTML=`<div class="quick-title-box"><label>Title</label><input type="text" class="quick-title-input" value="${escapeHtml(defaultValue||'')}"><button type="button" class="icon-btn quick-title-ok" title="Add">✓</button></div>`;
+  document.body.appendChild(overlay);
+  const input=overlay.querySelector('.quick-title-input');
+  requestAnimationFrame(()=>{ input.focus(); input.select(); });
+  let done=false;
+  function finish(commit){
+    if(done) return; done=true;
+    const val=input.value.trim();
+    overlay.remove();
+    document.removeEventListener('keydown', onKey, true);
+    if(commit) onConfirm(val || defaultValue || 'Untitled');
+  }
+  function onKey(e){ if(e.key==='Enter'){ e.preventDefault(); finish(true); } else if(e.key==='Escape'){ e.preventDefault(); finish(false); } }
+  document.addEventListener('keydown', onKey, true);
+  overlay.querySelector('.quick-title-ok').addEventListener('click', ()=>finish(true));
+  overlay.addEventListener('mousedown', e=>{ if(e.target===overlay) finish(false); });
+}
+function getTrip(){const start=parseDate(data.tripStart); const end=parseDate(data.tripEnd); return {start,end,days:Math.max(1,Math.ceil((end-start)/DAY))}}
+function getColGap(){const cs=getComputedStyle(document.documentElement); return {col:parseFloat(cs.getPropertyValue('--col')), gap:parseFloat(cs.getPropertyValue('--gap'))}}
+function xForTime(value){const {start,days}=getTrip(); const {col,gap}=getColGap(); const ms=parseDate(value)-start; let pos=Math.max(0,Math.min(days,ms/DAY)); if(pos>=days) return days*col+(days-1)*gap; const whole=Math.floor(pos); const frac=pos-whole; return whole*(col+gap)+frac*col}
+function timeForX(x){const {start,days}=getTrip(); const {col,gap}=getColGap(); const dayW=col+gap; let d=Math.floor(Math.max(0,x)/dayW); let rem=x-d*dayW; if(rem>col){d+=1; rem=0} d=Math.max(0,Math.min(days,d)); const frac=Math.max(0,Math.min(1,rem/col)); return new Date(start.getTime()+(d+frac)*DAY)}
+function quantize(dt){const q=(data.quantMinutes||30)*60000; return new Date(Math.round(dt.getTime()/q)*q)}
+function dayLocalX(width, dateStr, timeValue){const dayStart=parseDate(dateStr+'T00:00'); const t=parseDate(timeValue); const ms=Math.max(0,Math.min(DAY, t-dayStart)); return (ms/DAY)*width}
+function dayLocalTime(width, dateStr, x){const dayStart=parseDate(dateStr+'T00:00'); const frac=Math.max(0,Math.min(1, x/width)); return new Date(dayStart.getTime()+frac*DAY)}
+function getDragAfterElement(container, y, selector){
+  const els = $$(selector, container);
+  return els.reduce((closest, el)=>{
+    const box = el.getBoundingClientRect();
+    const offset = y - box.top - box.height/2;
+    if(offset < 0 && offset > closest.offset) return {offset, element: el};
+    return closest;
+  }, {offset: -Infinity, element: null}).element;
+}
+function applyEditMode(){
+  const on = $('#editModeToggle').checked;
+  document.body.classList.toggle('view-mode', !on);
+  if(!on) setRazor(false);
+  try{ localStorage.setItem('editableTripTimeline.editMode', on?'1':'0'); }catch(e){}
+}
+function updateUndoRedoButtons(){
+  const u=$('#undoBtn'), r=$('#redoBtn');
+  if(u) u.disabled = historyStack.length===0;
+  if(r) r.disabled = redoStack.length===0;
+}
+function pushHistory(){
+  historyStack.push(JSON.stringify(data));
+  if(historyStack.length>60) historyStack.shift();
+  redoStack.length=0;
+  updateUndoRedoButtons();
+}
+function restoreSnapshot(json){
+  closePanel();
+  if(dayDialogDate) closeDayDialog();
+  data = normalizeData(JSON.parse(json));
+  saveLocal(false); render();
+  updateUndoRedoButtons();
+}
+function undo(){
+  if(!historyStack.length) return;
+  redoStack.push(JSON.stringify(data));
+  restoreSnapshot(historyStack.pop());
+  toast('Undid last change.');
+}
+function redo(){
+  if(!redoStack.length) return;
+  historyStack.push(JSON.stringify(data));
+  restoreSnapshot(redoStack.pop());
+  toast('Redid change.');
+}
+function updateScrollerEdgePad(){
+  const scroller=$('#scroller'); if(!scroller) return;
+  const pad=Math.round(scroller.clientWidth/2)+18;
+  scroller.style.paddingLeft=pad+'px';
+  scroller.style.paddingRight=pad+'px';
+}
+function render(){normalizeData(data); const trip=getTrip(); const {col,gap}=getColGap(); const timelineWidth=trip.days*col+(trip.days-1)*gap; document.documentElement.style.setProperty('--day-count', trip.days); document.documentElement.style.setProperty('--timeline-width', timelineWidth+'px'); $('#tripTitle').textContent=data.title; renderRuler(); renderBars(); renderDays(); renderActions(); syncRaw(false); refreshTextView(); updatePlayheadReadout()}
+function renderRuler(){
+  const r=$('#dateRuler'); r.innerHTML='';
+  const {start,days}=getTrip();
+  let groupStart=0;
+  for(let i=1;i<=days;i++){
+    const prevDay=new Date(start.getTime()+(i-1)*DAY);
+    const curDay=i<days?new Date(start.getTime()+i*DAY):null;
+    const sameMonth = curDay && curDay.getMonth()===prevDay.getMonth() && curDay.getFullYear()===prevDay.getFullYear();
+    if(!sameMonth){
+      const gStart=new Date(start.getTime()+groupStart*DAY), gEnd=new Date(start.getTime()+i*DAY);
+      const x1=xForTime(gStart), x2=xForTime(gEnd);
+      const band=document.createElement('div'); band.className='month-band';
+      band.style.left=x1+'px'; band.style.width=Math.max(46,x2-x1)+'px';
+      band.textContent=gStart.toLocaleDateString(undefined,{month:'long', year: gStart.getFullYear()!==start.getFullYear()?'numeric':undefined});
+      r.appendChild(band);
+      groupStart=i;
+    }
+  }
+  for(let i=0;i<days;i++){
+    const dayStart=new Date(start.getTime()+i*DAY);
+    [[0,6,'night'],[6,20,'day'],[20,24,'night']].forEach(([h1,h2,cls])=>{
+      const bx1=xForTime(new Date(dayStart.getTime()+h1*3600000));
+      const bx2=xForTime(new Date(dayStart.getTime()+h2*3600000));
+      const band=document.createElement('div'); band.className='sky-band '+cls;
+      band.style.left=bx1+'px'; band.style.width=Math.max(1,bx2-bx1)+'px';
+      r.appendChild(band);
+    });
+    const sunX=xForTime(new Date(dayStart.getTime()+13*3600000));
+    const sun=document.createElement('div'); sun.className='sky-icon'; sun.style.left=sunX+'px'; sun.textContent='☀️'; r.appendChild(sun);
+    const moonX=xForTime(new Date(dayStart.getTime()+1*3600000));
+    const moon=document.createElement('div'); moon.className='sky-icon'; moon.style.left=moonX+'px'; moon.textContent='🌙'; r.appendChild(moon);
+    const dayX=xForTime(dayStart);
+    const line=document.createElement('div'); line.className='day-line'; line.style.left=dayX+'px'; r.appendChild(line);
+    const label=document.createElement('div'); label.className='day-label'; label.style.left=dayX+'px';
+    label.textContent=dayStart.toLocaleDateString(undefined,{weekday:'short',day:'numeric'});
+    r.appendChild(label);
+    for(let h=1; h<24; h++){
+      const hx=xForTime(new Date(dayStart.getTime()+h*3600000));
+      const major=h%6===0;
+      const ht=document.createElement('div'); ht.className='hour-line'+(major?' major':''); ht.style.left=hx+'px'; r.appendChild(ht);
+      if(major){const hl=document.createElement('div'); hl.className='hour-label'; hl.style.left=hx+'px'; hl.textContent=String(h).padStart(2,'0')+':00'; r.appendChild(hl);}
+    }
+  }
+  const mk=document.createElement('div'); mk.id='rulerMarkers'; r.appendChild(mk);
+  renderActivityMarkers();
+}
+function scrollPlayheadTo(dt, instant){
+  const scroller=$('#scroller'); if(!scroller) return;
+  const padLeft=parseFloat(getComputedStyle(scroller).paddingLeft)||0;
+  scroller.scrollTo({left: xForTime(dt) - scroller.clientWidth/2 + padLeft, behavior: instant?'instant':'smooth'});
+}
+// Color-coded activity markers on the ruler — a minimap of the day-card activities. Click to jump.
+function renderActivityMarkers(){
+  const mk=$('#rulerMarkers'); if(!mk) return; mk.innerHTML='';
+  data.dayCards.forEach(day=>day.cards.forEach(c=>{
+    const x1=xForTime(c.start), x2=xForTime(c.end);
+    const b=document.createElement('button'); b.type='button';
+    b.className=`act-marker c-${c.color||'blue'}`;
+    b.dataset.date=day.date; b.dataset.cid=c.id;
+    b.style.left=x1+'px'; b.style.width=Math.max(7,x2-x1)+'px';
+    b.title=`${c.title||'Untitled'} · ${prettyWindow(c.start,c.end)} — click to jump there`;
+    b.addEventListener('click',()=>{ scrollPlayheadTo(new Date((parseDate(c.start).getTime()+parseDate(c.end).getTime())/2)); });
+    mk.appendChild(b);
+  }));
+}
+function skyPhase(dt){ const h=dt.getHours()+dt.getMinutes()/60; return (h>=6 && h<20) ? 'day' : 'night'; }
+function skyGlyph(dt){ return skyPhase(dt)==='day' ? '☀️' : '🌙'; }
+function computeStatusAt(dt){
+  const loc=data.locations.find(p=>parseDate(p.start)<=dt && dt<parseDate(p.end));
+  const trn=data.transport.find(t=>parseDate(t.start)<=dt && dt<parseDate(t.end));
+  const stay=data.stays.find(s=>parseDate(s.start)<=dt && dt<parseDate(s.end));
+  const date=fmtDate(dt);
+  const day=data.dayCards.find(d=>d.date===date);
+  const card=day && day.cards.find(c=>parseDate(c.start)<=dt && dt<parseDate(c.end));
+  // Always return exactly 4 fixed slots (filled or empty) so the HUD's height never changes as you scroll.
+  const stayDetails = stay ? [stay.address, stay.details].filter(Boolean).join(' · ') : null;
+  return [
+    {label:'Location', value:loc?loc.name:null, icon:'⌖', color:loc?loc.color:null, ref:loc?{kind:'lane',type:'locations',id:loc.id}:null, details:loc?loc.details:null},
+    {label:trn?(TRANSPORT_VERB[trn.mode]||'Traveling'):'Transport', value:trn?trn.name:null, icon:trn?(MODE_ICON[trn.mode]||'→'):'→', color:trn?trn.color:null, ref:trn?{kind:'lane',type:'transport',id:trn.id}:null, details:trn?trn.details:null},
+    {label:'Staying', value:stay?stay.name:null, icon:'⌂', color:stay?stay.color:null, ref:stay?{kind:'lane',type:'stays',id:stay.id}:null, details:stayDetails},
+    {label:'Doing', value:card?card.title:null, icon:'•', color:card?card.color:null, ref:card?{kind:'card',date,id:card.id}:null, details:card?card.body:null}
+  ];
+}
+// The details rail under the status panel — shows the free-text notes of whatever's
+// currently active (location, transport, lodging, activity). Hidden entirely when none
+// of the active items carry any details, so the HUD stays compact.
+function renderStatusDetails(lines){
+  let el=$('#playheadDetails');
+  if(!el){
+    el=document.createElement('div'); el.id='playheadDetails'; el.className='status-details';
+    const status=$('#playheadStatus');
+    if(status && status.parentNode) status.parentNode.insertBefore(el, status.nextSibling);
+  }
+  const withDetails=lines.filter(l=>l.value && l.details && String(l.details).trim());
+  if(!withDetails.length){ el.style.display='none'; el.innerHTML=''; return; }
+  el.style.display='';
+  el.innerHTML=withDetails.map(l=>{
+    const refAttrs=l.ref&&l.ref.kind==='lane' ? `data-kind="lane" data-type="${l.ref.type}" data-id="${l.ref.id}"` :
+      l.ref ? `data-kind="card" data-date="${l.ref.date}" data-id="${l.ref.id}"` : '';
+    const tag=l.ref?'button':'div';
+    return `<${tag} type="button" class="detail-line c-${l.color||'blue'}" ${refAttrs}${l.ref?` title="Open “${escapeHtml(l.value)}” in the editor"`:''}>`+
+      `<span class="detail-head"><span class="detail-icon">${l.icon}</span><span class="detail-name">${escapeHtml(l.value)}</span></span>`+
+      `<span class="detail-body">${escapeHtml(String(l.details).trim())}</span></${tag}>`;
+  }).join('');
+}
+function updateNowHighlights(dt){
+  $$('.mini-block, .act-marker').forEach(el=>{
+    const date=el.dataset.date, cid=el.dataset.cid;
+    const day=data.dayCards.find(d=>d.date===date);
+    const card=day && day.cards.find(c=>c.id===cid);
+    const active=!!(card && parseDate(card.start)<=dt && dt<parseDate(card.end));
+    el.classList.toggle('now', active);
+  });
+}
+// The itinerary's wall-clock times are Norway (Europe/Oslo) local time. To show what that same
+// instant reads back home, we recover the real UTC instant for the Oslo wall clock, then format it
+// in each home zone (handles DST automatically via the Intl engine).
+function tzOffsetMs(timeZone, atMs){
+  const p=new Intl.DateTimeFormat('en-US',{timeZone,hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'})
+    .formatToParts(new Date(atMs)).reduce((a,x)=>{a[x.type]=x.value;return a},{});
+  const h=p.hour==='24'?0:+p.hour;
+  return Date.UTC(+p.year,+p.month-1,+p.day,h,+p.minute,+p.second)-atMs;
+}
+function osloWallToInstant(dt){
+  const wallAsUTC=Date.UTC(dt.getFullYear(),dt.getMonth(),dt.getDate(),dt.getHours(),dt.getMinutes());
+  let inst=wallAsUTC - tzOffsetMs('Europe/Oslo', wallAsUTC);
+  inst=wallAsUTC - tzOffsetMs('Europe/Oslo', inst); // one refinement pass covers DST edges
+  return inst;
+}
+const HOME_ZONES=[
+  {place:'Florida', abbr:'ET', tz:'America/New_York'},
+  {place:'Santa Cruz', abbr:'PT', tz:'America/Los_Angeles'}
+];
+function renderAltTimes(dt){
+  const el=$('#altTimes'); if(!el) return;
+  el.classList.toggle('on', showHomeTimes);
+  if(!showHomeTimes){ el.innerHTML=''; return; }
+  const inst=osloWallToInstant(dt);
+  el.innerHTML=HOME_ZONES.map(z=>{
+    const s=new Intl.DateTimeFormat(undefined,{timeZone:z.tz,weekday:'short',hour:'numeric',minute:'2-digit'}).format(new Date(inst));
+    return `<div class="alt-time"><span>${z.place}</span><span class="alt-place">${z.abbr}</span><span class="alt-clock">${s}</span></div>`;
+  }).join('');
+}
+function updatePlayheadReadout(){
+  const scroller=$('#scroller'); if(!scroller||!scroller.clientWidth) return;
+  const padLeft=parseFloat(getComputedStyle(scroller).paddingLeft)||0;
+  // Pin the visual playhead line to the scroller's content center — left:50% of the timeline
+  // area sits half a scrollbar-width off from where the time is actually computed.
+  const lineX=Math.round(scroller.clientWidth/2);
+  const ph=$('#playhead');
+  if(ph && ph.__x!==lineX){ ph.__x=lineX; ph.style.left=lineX+'px'; }
+  const boardX=scroller.scrollLeft + scroller.clientWidth/2 - padLeft;
+  const dt=timeForX(Math.max(0,boardX));
+  $('#tripSubtitle').innerHTML=`<span class="sky-glyph">${skyGlyph(dt)}</span> ${dt.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})} · ${dt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}`;
+  renderAltTimes(dt);
+  const statusEl=$('#playheadStatus');
+  if(statusEl){
+    const lines=computeStatusAt(dt);
+    statusEl.innerHTML = lines.map(l=>{
+      const inner=`<span class="status-label">${escapeHtml(l.label)}</span><span class="status-icon">${l.icon}</span><span class="status-value">${l.value?escapeHtml(l.value):'—'}</span>`;
+      if(!l.value || !l.ref) return `<div class="status-line empty">${inner}</div>`;
+      const refAttrs=l.ref.kind==='lane' ? `data-kind="lane" data-type="${l.ref.type}" data-id="${l.ref.id}"` : `data-kind="card" data-date="${l.ref.date}" data-id="${l.ref.id}"`;
+      return `<button type="button" class="status-line c-${l.color||'blue'}" ${refAttrs} title="Open “${escapeHtml(l.value)}” in the editor">${inner}</button>`;
+    }).join('');
+    renderStatusDetails(lines);
+  }
+  updateNowHighlights(dt);
+  highlightTextView(dt);
+  updateBarLabels();
+  updatePlayheadLaneTags();
+}
+// Lane tags ride along the left side of the playhead, one per visible lane row.
+function updatePlayheadLaneTags(){
+  const area=$('#timelineArea'); if(!area) return;
+  let wrap=$('#phLaneTags');
+  if(!wrap){ wrap=document.createElement('div'); wrap.id='phLaneTags'; area.appendChild(wrap); }
+  const sc=$('#scroller'); if(sc && sc.clientWidth) wrap.style.left=Math.round(sc.clientWidth/2)+'px';
+  const areaRect=area.getBoundingClientRect();
+  wrap.innerHTML='';
+  [['#locationLayer','Location','c-yellow','⌖',22],['#transportLayer','Transport','c-pink','→',22],['#stayLayer','Lodging','c-blue','⌂',33]].forEach(([sel,word,color,icon,mid])=>{
+    const layer=$(sel); if(!layer) return;
+    const r=layer.getBoundingClientRect();
+    if(r.height<8) return;
+    const top=r.top-areaRect.top+mid;
+    if(top<12 || top>areaRect.height-6) return;
+    const tag=document.createElement('div'); tag.className='ph-lane-tag '+color;
+    tag.innerHTML=`<span class="ph-lane-tag-icon">${icon}</span>${word}`;
+    tag.style.top=top+'px';
+    wrap.appendChild(tag);
+  });
+}
+function renderBars(){renderLocationBars(); renderTransportBars(); renderStayBars(); updateBarLabels()}
+function computeGaps(items){
+  const tripStart=parseDate(data.tripStart), tripEnd=parseDate(data.tripEnd);
+  const gaps=[]; let cursor=tripStart;
+  items.forEach(it=>{const s=parseDate(it.start); if(s-cursor>=60000) gaps.push([new Date(cursor), new Date(s)]); const e=parseDate(it.end); if(e>cursor) cursor=e;});
+  if(tripEnd-cursor>=60000) gaps.push([new Date(cursor), new Date(tripEnd)]);
+  return gaps;
+}
+function laneTypeLabel(type){return type==='locations'?'location':type==='transport'?'transportation':'lodging'}
+function renderLaneGaps(layer, type, items, topPx, heightPx, laneIdx){
+  const durMs = type==='transport' ? 12*3600000 : DAY; // pre-measured block: 24h location/lodging, 12h transport
+  computeGaps(items).forEach(([gs,ge])=>{
+    const x1=xForTime(gs), x2=xForTime(ge); const w=Math.max(28, x2-x1);
+    const clampMs=Math.min(durMs, ge-gs);
+    const btn=document.createElement('button'); btn.className='gap-add'; btn.type='button';
+    btn.title=`Add ${laneTypeLabel(type)} block · hover to position, click to place`;
+    btn.style.left=x1+'px'; btn.style.top=topPx+'px'; btn.style.width=w+'px'; btn.style.height=heightPx+'px';
+    btn.innerHTML=`<span class="plus-hint">+</span><div class="ghost-block"><span class="ghost-label"></span></div>`;
+    const ghost=btn.querySelector('.ghost-block'); const ghostLabel=btn.querySelector('.ghost-label');
+    let ghostStart=null;
+    btn.addEventListener('pointermove', e=>{
+      if(dragState||moveState||miniDragState||seamDragState) return;
+      const rect=$('#board').getBoundingClientRect();
+      let t=quantize(timeForX(e.clientX-rect.left));
+      const latest=new Date(ge.getTime()-clampMs);
+      if(t<gs) t=new Date(gs);
+      if(t>latest) t=new Date(latest);
+      ghostStart=t;
+      const tEnd=new Date(t.getTime()+clampMs);
+      const gx1=xForTime(t), gx2=xForTime(tEnd);
+      ghost.style.left=(gx1-x1)+'px'; ghost.style.width=Math.max(26,gx2-gx1)+'px';
+      ghostLabel.textContent=`${prettyDate(t)} ${prettyTime(t)} → ${prettyDate(tEnd)} ${prettyTime(tEnd)}`;
+      ghost.classList.add('on'); btn.classList.add('ghosting');
+    });
+    btn.addEventListener('pointerleave', ()=>{ ghost.classList.remove('on'); btn.classList.remove('ghosting'); ghostStart=null; });
+    btn.addEventListener('click', ()=>addBlockInGap(type, gs, ge, laneIdx, ghostStart));
+    layer.appendChild(btn);
+  });
+}
+function addBlockInGap(type, gs, ge, laneIdx, chosenStart){
+  const prefix = type==='locations'?'loc':type==='transport'?'trn':'s';
+  const defaultName = type==='locations'?'New Location':type==='transport'?'New Transport':'New Stay';
+  // chosenStart comes from the hover ghost (already snapped + clamped); fall back to the gap start.
+  const durMs = type==='transport' ? 12*3600000 : DAY;
+  let start = chosenStart ? new Date(chosenStart) : new Date(gs);
+  if(start<gs) start=new Date(gs);
+  const end = new Date(Math.min(start.getTime()+durMs, ge.getTime()));
+  promptQuickTitle(defaultName, (title)=>{
+    const item={id:uid(prefix), name:title, color:'blue', start:fmtDateTime(start), end:fmtDateTime(end), details:''};
+    if(type==='transport') item.mode='plane';
+    if(type==='stays'){ item.address=''; item.lane=laneIdx||0; }
+    pushHistory();
+    data[type].push(item); saveLocal(false); render();
+  });
+}
+function renderSingleRowLane(type, layerSel, badgeGlyph, badgeTitle, labelFn){
+  const layer=$(layerSel); layer.innerHTML='';
+  const sorted=[...data[type]].sort((a,b)=>parseDate(a.start)-parseDate(b.start));
+  sorted.forEach(item=>{
+    const index=data[type].indexOf(item); const rawW=xForTime(item.end)-xForTime(item.start);
+    const b=document.createElement('div'); b.className=`bar movable c-${item.color||'blue'}${rawW<170?' short':''}`;
+    b.dataset.type=type; b.dataset.index=index; b.style.left=xForTime(item.start)+'px'; b.style.top='0px'; b.style.width=Math.max(70,rawW)+'px';
+    b.innerHTML=`<button class="handle left" title="Resize start"></button><span class="bar-label">${labelFn(item)}</span><button class="handle right" title="Resize end"></button>`;
+    b.title=`${item.name} · ${prettyWindow(item.start,item.end)} · drag to move, edges to resize`;
+    b.addEventListener('click',e=>{if(clickSuppress||e.target.classList.contains('handle'))return; openItem(type,index)});
+    layer.appendChild(b);
+  });
+  for(let k=0;k<sorted.length-1;k++){
+    if(parseDate(sorted[k].end).getTime()!==parseDate(sorted[k+1].start).getTime()) continue;
+    layer.appendChild(makeSeamHandle(type, sorted[k], sorted[k+1], 0, 44));
+  }
+  renderLaneGaps(layer, type, sorted, 0, 44);
+}
+function renderLocationBars(){ renderSingleRowLane('locations','#locationLayer','⌖','Location lane', item=>escapeHtml(item.name)); }
+function renderTransportBars(){ renderSingleRowLane('transport','#transportLayer','→','Transportation lane', item=>`${MODE_ICON[item.mode||'plane']} ${escapeHtml(item.name)}`); }
+function renderStayBars(){
+  const layer=$('#stayLayer'); layer.innerHTML='';
+  const maxLane=data.stays.reduce((m,s)=>Math.max(m,s.lane||0), -1);
+  const laneCount=Math.max(1, maxLane+1);
+  layer.style.height=(laneCount*76)+'px';
+  for(let laneIdx=0; laneIdx<laneCount; laneIdx++){
+    const laneItems=data.stays.filter(s=>(s.lane||0)===laneIdx).sort((a,b)=>parseDate(a.start)-parseDate(b.start));
+    laneItems.forEach(item=>{
+      const index=data.stays.indexOf(item); const rawW=xForTime(item.end)-xForTime(item.start);
+      const b=document.createElement('div'); b.className=`bar staybar movable c-${item.color||'blue'}${rawW<210?' short':''}`;
+      b.dataset.type='stays'; b.dataset.index=index; b.style.left=xForTime(item.start)+'px'; b.style.top=(laneIdx*76)+'px'; b.style.width=Math.max(96,rawW)+'px';
+      b.innerHTML=`<button class="handle left" title="Resize check-in/start"></button><span class="bar-label">${escapeHtml(item.name)}</span><span class="bar-sub">${escapeHtml(item.address||prettyWindow(item.start,item.end))}</span><button class="handle right" title="Resize checkout/end"></button>`;
+      b.title=`${item.name} · ${prettyWindow(item.start,item.end)}${item.address?' · '+item.address:''} · drag to move, edges to resize`;
+      b.addEventListener('click',e=>{if(clickSuppress||e.target.classList.contains('handle'))return; openItem('stays',index)});
+      layer.appendChild(b);
+    });
+    for(let k=0;k<laneItems.length-1;k++){
+      if(parseDate(laneItems[k].end).getTime()!==parseDate(laneItems[k+1].start).getTime()) continue;
+      layer.appendChild(makeSeamHandle('stays', laneItems[k], laneItems[k+1], laneIdx*76, 66));
+    }
+    renderLaneGaps(layer, 'stays', laneItems, laneIdx*76, 66, laneIdx);
+  }
+}
+function getNeighborBounds(type, item){
+  const tripStart=parseDate(data.tripStart), tripEnd=parseDate(data.tripEnd);
+  let lane;
+  if(type==='locations' || type==='transport'){ lane=[...data[type]].sort((a,b)=>parseDate(a.start)-parseDate(b.start)); }
+  else { lane=data.stays.filter(s=>(s.lane||0)===(item.lane||0)).sort((a,b)=>parseDate(a.start)-parseDate(b.start)); }
+  const pos=lane.findIndex(x=>x.id===item.id);
+  const prev=lane[pos-1], next=lane[pos+1];
+  return { prevEnd: prev?parseDate(prev.end):tripStart, nextStart: next?parseDate(next.start):tripEnd };
+}
+function getMoveBounds(type, item){
+  const {prevEnd, nextStart}=getNeighborBounds(type,item);
+  const durationMs=parseDate(item.end)-parseDate(item.start);
+  return { lower: prevEnd, upper: new Date(nextStart-durationMs) };
+}
+function dayObj(date){let d=data.dayCards.find(x=>x.date===date); if(!d){d={date,cards:[]}; data.dayCards.push(d)} return d}
+function computeGapsLocal(date, items){
+  const dayStart=parseDate(date+'T00:00'), dayEnd=new Date(dayStart.getTime()+DAY);
+  const gaps=[]; let cursor=dayStart;
+  items.forEach(it=>{const s=parseDate(it.start); if(s-cursor>=60000) gaps.push([new Date(cursor), new Date(Math.min(s,dayEnd))]); const e=parseDate(it.end); if(e>cursor) cursor=e;});
+  if(dayEnd-cursor>=60000) gaps.push([new Date(cursor), dayEnd]);
+  return gaps;
+}
+function renderDayMiniTimeline(container, date, pxHeight, opts){
+  const day=dayObj(date);
+  assignLanes(day.cards);
+  container.innerHTML='';
+  container.style.height=pxHeight+'px';
+  const maxLane=day.cards.reduce((m,c)=>Math.max(m,c.lane||0), -1);
+  const laneCount=Math.max(1, maxLane+1);
+  const totalW=container.clientWidth || (opts.compact?140:280);
+  const laneW=totalW/laneCount;
+  const toY=(timeStr)=>dayLocalX(pxHeight, date, timeStr);
+  day.cards.forEach(c=>{
+    const y1=toY(c.start), y2=toY(c.end);
+    const el=document.createElement('div');
+    el.className=`mini-block c-${c.color||'blue'}`+(dayDialogSelectedId===c.id?' selected':'');
+    el.dataset.cid=c.id; el.dataset.date=date;
+    el.style.top=(y1+3)+'px'; el.style.height=Math.max(16,y2-y1-4)+'px'; el.style.left=((c.lane||0)*laneW+2)+'px'; el.style.width=Math.max(20,laneW-6)+'px';
+    el.innerHTML=`<button class="mini-handle top" title="Resize start"></button><span class="mini-label">${escapeHtml(c.title||'Untitled')}</span><button class="mini-handle bottom" title="Resize end"></button><button type="button" class="mini-edit-btn" title="Rename">✎</button>`;
+    el.title=`${c.title} · ${prettyWindow(c.start,c.end)}`;
+    container.appendChild(el);
+  });
+  for(let li=0; li<laneCount; li++){
+    const laneItems=day.cards.filter(c=>(c.lane||0)===li).sort((a,b)=>parseDate(a.start)-parseDate(b.start));
+    // Seam handles between touching activities — drag to move the shared boundary of both at once.
+    for(let k=0;k<laneItems.length-1;k++){
+      const a=laneItems[k], b=laneItems[k+1];
+      if(parseDate(a.end).getTime()!==parseDate(b.start).getTime()) continue;
+      const sh=document.createElement('button'); sh.type='button'; sh.className='mini-seam';
+      sh.dataset.date=date; sh.dataset.prev=a.id; sh.dataset.next=b.id;
+      sh.style.top=toY(a.end)+'px'; sh.style.left=(li*laneW+2)+'px'; sh.style.width=Math.max(20,laneW-6)+'px';
+      sh.title=`Drag to move the boundary between “${a.title}” and “${b.title}”`;
+      container.appendChild(sh);
+    }
+    // Ghost gap zones on every free stretch (2h pre-measured activity, snapped to the quantum).
+    // In compact cards they're invisible until hovered so the cards stay clean.
+    computeGapsLocal(date, laneItems).forEach(([gs,ge])=>{
+      const y1=toY(fmtDateTime(gs)), y2=toY(fmtDateTime(ge));
+      const btnTop=y1+2;
+      const durMs=Math.min(2*3600000, ge-gs);
+      const btn=document.createElement('button'); btn.className='mini-gap-add'+(opts.compact?' quiet':''); btn.type='button';
+      btn.style.top=btnTop+'px'; btn.style.height=Math.max(14,y2-y1-4)+'px'; btn.style.left=(li*laneW+2)+'px'; btn.style.width=Math.max(18,laneW-4)+'px';
+      btn.innerHTML=`<span class="plus-hint">+</span><div class="ghost-block v"><span class="ghost-label"></span></div>`;
+      btn.title='Add activity · hover to position, click to place';
+      const ghost=btn.querySelector('.ghost-block'); const ghostLabel=btn.querySelector('.ghost-label');
+      let ghostStart=null;
+      btn.addEventListener('pointermove', e=>{
+        if(dragState||moveState||miniDragState||seamDragState) return;
+        const rect=container.getBoundingClientRect();
+        let t=quantize(dayLocalTime(pxHeight, date, e.clientY-rect.top));
+        const latest=new Date(ge.getTime()-durMs);
+        if(t<gs) t=new Date(gs);
+        if(t>latest) t=new Date(latest);
+        ghostStart=t;
+        const tEnd=new Date(t.getTime()+durMs);
+        const gy1=toY(fmtDateTime(t)), gy2=toY(fmtDateTime(tEnd));
+        ghost.style.top=(gy1-btnTop)+'px'; ghost.style.height=Math.max(16,gy2-gy1)+'px';
+        ghostLabel.textContent=`${prettyTime(t)}–${prettyTime(tEnd)}`;
+        ghost.classList.add('on'); btn.classList.add('ghosting');
+      });
+      btn.addEventListener('pointerleave', ()=>{ ghost.classList.remove('on'); btn.classList.remove('ghosting'); ghostStart=null; });
+      btn.addEventListener('click', ev=>{ev.stopPropagation(); addCardInGap(date, gs, ge, li, ghostStart);});
+      container.appendChild(btn);
+    });
+  }
+  if(opts.compact){
+    // Morning/Afternoon/Night quick slots on top — only when that whole window is free.
+    // Partially covered windows fall through to the ghost gap zones underneath.
+    Object.entries(DAY_SEGMENTS).forEach(([key,seg])=>{
+      const gs=parseDate(date+'T'+seg.start), ge=parseDate(date+'T'+seg.end);
+      const occupied=day.cards.some(c=>parseDate(c.start)<ge && gs<parseDate(c.end));
+      if(occupied) return;
+      const y1=toY(fmtDateTime(gs)), y2=toY(fmtDateTime(ge));
+      const btn=document.createElement('button'); btn.className='seg-slot'; btn.type='button';
+      btn.style.top=(y1+2)+'px'; btn.style.height=Math.max(20,y2-y1-4)+'px'; btn.style.left='2px'; btn.style.right='2px';
+      btn.innerHTML=`<span class="seg-slot-icon">${seg.icon}</span><span class="seg-slot-plus">+</span>`;
+      btn.title=`Add ${seg.label.toLowerCase()} activity (${seg.start}–${seg.end})`;
+      btn.addEventListener('click', ev=>{ev.stopPropagation(); addCardInGap(date, gs, ge, null);});
+      container.appendChild(btn);
+    });
+  }
+}
+function getCardNeighborBounds(date, card){
+  const dayStart=parseDate(date+'T00:00'), dayEnd=new Date(dayStart.getTime()+DAY);
+  const day=dayObj(date);
+  const lane=day.cards.filter(c=>(c.lane||0)===(card.lane||0)).sort((a,b)=>parseDate(a.start)-parseDate(b.start));
+  const pos=lane.findIndex(x=>x.id===card.id);
+  const prev=lane[pos-1], next=lane[pos+1];
+  return { prevEnd: prev?parseDate(prev.end):dayStart, nextStart: next?parseDate(next.start):dayEnd };
+}
+function addCardInGap(date, gs, ge, laneIdx, chosenStart){
+  promptQuickTitle('New activity', (title)=>{
+    const day=dayObj(date);
+    // Ghost placement: 2h block at the snapped hover position. Otherwise (seg-slots) fill the window.
+    const start = chosenStart ? new Date(chosenStart) : new Date(gs);
+    const end = chosenStart ? new Date(Math.min(start.getTime()+2*3600000, ge.getTime())) : new Date(ge);
+    const lane = laneIdx!=null ? laneIdx : findFreeLaneIn(day.cards, start, end, null);
+    const card={id:uid('card'), title, body:'', color:'blue', start:fmtDateTime(start), end:fmtDateTime(end), lane};
+    pushHistory();
+    day.cards.push(card);
+    saveLocal(false);
+    rerenderDayViews(date);
+  });
+}
+function rerenderDayViews(date){
+  const dayCardEl=$(`.day-card[data-date="${date}"]`);
+  if(dayCardEl){ const mini=$('.mini-timeline.compact',dayCardEl); if(mini){ renderDayMiniTimeline(mini,date,COMPACT_DAY_PX,{compact:true}); } }
+  if(dayDialogDate===date){ renderDialogTimeline(); }
+  renderActivityMarkers();
+}
+function startMiniInteraction(e){
+  if(razorOn) return;
+  if(e.target.closest('.mini-gap-add')) return;
+  if(e.target.closest('.mini-edit-btn')) return;
+  if(e.target.closest('.mini-label.editing')) return;
+  const seam=e.target.closest('.mini-seam');
+  if(seam){
+    const container=seam.closest('.mini-timeline'); if(!container) return;
+    e.preventDefault(); e.stopPropagation();
+    pushHistory();
+    miniDragState={mode:'seam', date:seam.dataset.date, prevId:seam.dataset.prev, nextId:seam.dataset.next, pxHeight:container.clientHeight||COMPACT_DAY_PX, container};
+    document.body.classList.add('resizing');
+    return;
+  }
+  const handle=e.target.closest('.mini-handle');
+  const block=e.target.closest('.mini-block');
+  if(!block) return;
+  const container=block.closest('.mini-timeline'); if(!container) return;
+  const date=block.dataset.date, cid=block.dataset.cid;
+  const day=dayObj(date); const card=day.cards.find(c=>c.id===cid); if(!card) return;
+  const pxHeight=container.clientHeight||COMPACT_DAY_PX;
+  if(handle){
+    e.preventDefault(); e.stopPropagation();
+    pushHistory();
+    miniDragState={mode:'resize', date, cid, edge:handle.classList.contains('top')?'start':'end', pxHeight, container};
+    document.body.classList.add('resizing');
+    return;
+  }
+  const durationMs=parseDate(card.end)-parseDate(card.start);
+  const rect=container.getBoundingClientRect();
+  const grabDy=(e.clientY-rect.top)-dayLocalX(pxHeight,date,card.start); // where inside the block we grabbed
+  miniDragState={mode:'move', date, cid, startClientY:e.clientY, durationMs, pxHeight, container, moving:false, grabDy,
+    color:card.color||'blue', title:card.title||'Untitled', targetDate:date, targetStart:parseDate(card.start), targetEnd:parseDate(card.end)};
+}
+function markCardDragging(cid, on){ if(!cid) return; $$(`.mini-block[data-cid="${cid}"]`).forEach(b=>b.classList.toggle('dragging',on)); }
+function removeMoveGhost(){ const g=document.getElementById('miniMoveGhost'); if(g) g.remove(); }
+// Draws the translucent landing preview for a move-drag. Never mutates data — it only paints where
+// the block will end up, so the drag stays smooth and reordering above/below other blocks is visible.
+function drawMoveGhost(container, date, pxH, start, end, lane, color, title){
+  removeMoveGhost();
+  const day=dayObj(date);
+  const maxLane=day.cards.reduce((m,c)=> c.id===miniDragState.cid?m:Math.max(m,c.lane||0), -1);
+  const laneCount=Math.max(1, maxLane+1, lane+1);
+  const totalW=container.clientWidth||140; const laneW=totalW/laneCount;
+  const y1=dayLocalX(pxH,date,fmtDateTime(start)), y2=dayLocalX(pxH,date,fmtDateTime(end));
+  const g=document.createElement('div'); g.id='miniMoveGhost'; g.className=`mini-block ghost-move c-${color}`;
+  g.style.top=(y1+3)+'px'; g.style.height=Math.max(16,y2-y1-4)+'px'; g.style.left=(lane*laneW+2)+'px'; g.style.width=Math.max(20,laneW-6)+'px';
+  g.innerHTML=`<span class="mini-label">${escapeHtml(title)}</span>`;
+  container.appendChild(g);
+}
+function onMiniInteraction(e){
+  if(!miniDragState) return;
+  if(miniDragState.mode==='seam'){
+    const day=dayObj(miniDragState.date);
+    const prev=day.cards.find(c=>c.id===miniDragState.prevId), next=day.cards.find(c=>c.id===miniDragState.nextId);
+    if(!prev||!next) return;
+    const rect=miniDragState.container.getBoundingClientRect();
+    let t=quantize(dayLocalTime(miniDragState.pxHeight, miniDragState.date, e.clientY-rect.top));
+    const q=(data.quantMinutes||30)*60000;
+    const lo=new Date(parseDate(prev.start).getTime()+q), hi=new Date(parseDate(next.end).getTime()-q);
+    if(t<lo) t=new Date(lo);
+    if(t>hi) t=new Date(hi);
+    prev.end=fmtDateTime(t); next.start=fmtDateTime(t);
+    showDragTip(e, `boundary → ${prettyTime(t)}`);
+    saveLocal(false); rerenderDayViews(miniDragState.date);
+    return;
+  }
+  // Move: deferred-commit with a live ghost preview. The block can travel the whole day (and, for
+  // compact cards, hop to another day), so you can freely drop it above or below other activities.
+  // We only paint a ghost here; nothing is written to the data until drop, keeping the drag smooth.
+  if(miniDragState.mode==='move'){
+    const dy=e.clientY-miniDragState.startClientY;
+    if(!miniDragState.moving){ if(Math.abs(dy)<5) return; miniDragState.moving=true; pushHistory(); document.body.classList.add('block-dragging'); markCardDragging(miniDragState.cid,true); }
+    let targetContainer=miniDragState.container;
+    if(miniDragState.container.classList.contains('compact')){
+      const under=document.elementFromPoint(e.clientX, e.clientY);
+      const tm=under && under.closest('.mini-timeline.compact');
+      if(tm && tm.dataset.date) targetContainer=tm;
+    }
+    const targetDate=targetContainer.dataset.date||miniDragState.date;
+    const pxH=targetContainer.clientHeight||miniDragState.pxHeight;
+    const rect=targetContainer.getBoundingClientRect();
+    const durationMs=miniDragState.durationMs;
+    let start=quantize(dayLocalTime(pxH, targetDate, (e.clientY-rect.top)-miniDragState.grabDy));
+    const dayStart=parseDate(targetDate+'T00:00'), dayEnd=new Date(dayStart.getTime()+DAY);
+    if(start<dayStart) start=new Date(dayStart);
+    if(start.getTime()+durationMs>dayEnd.getTime()) start=new Date(dayEnd.getTime()-durationMs);
+    const end=new Date(start.getTime()+durationMs);
+    const lane=findFreeLaneIn(dayObj(targetDate).cards, start, end, miniDragState.cid);
+    Object.assign(miniDragState,{targetDate,targetStart:start,targetEnd:end,targetLane:lane});
+    drawMoveGhost(targetContainer, targetDate, pxH, start, end, lane, miniDragState.color, miniDragState.title);
+    showDragTip(e, targetDate!==miniDragState.date ? `${prettyDate(start)} · ${prettyTime(start)}–${prettyTime(end)}` : `${prettyTime(start)}–${prettyTime(end)}`);
+    return;
+  }
+  const date=miniDragState.date, cid=miniDragState.cid;
+  const day=dayObj(date); const card=day.cards.find(c=>c.id===cid); if(!card) return;
+  if(miniDragState.mode==='resize'){
+    const rect=miniDragState.container.getBoundingClientRect();
+    const y=e.clientY-rect.top;
+    let t=quantize(dayLocalTime(miniDragState.pxHeight,date,y));
+    const {prevEnd,nextStart}=getCardNeighborBounds(date,card);
+    if(miniDragState.edge==='start'){ if(t<prevEnd) t=new Date(prevEnd); if(t<parseDate(card.end)) card.start=fmtDateTime(t); }
+    else { if(t>nextStart) t=new Date(nextStart); if(t>parseDate(card.start)) card.end=fmtDateTime(t); }
+    showDragTip(e, `${prettyTime(card.start)}–${prettyTime(card.end)}`);
+    saveLocal(false); rerenderDayViews(date);
+  }
+}
+function endMiniInteraction(){
+  const st=miniDragState;
+  if(st && st.mode==='move' && st.moving){
+    // Commit the ghost's landing spot: re-time the card and, if it hopped days, move it between buckets.
+    const oldDate=st.date, cid=st.cid;
+    const oldDay=dayObj(oldDate); const idx=oldDay.cards.findIndex(c=>c.id===cid);
+    const newDate=st.targetDate||oldDate;
+    if(idx>-1){
+      const card=oldDay.cards[idx];
+      card.start=fmtDateTime(st.targetStart); card.end=fmtDateTime(st.targetEnd);
+      if(newDate!==oldDate){ oldDay.cards.splice(idx,1); dayObj(newDate).cards.push(card); if(dayDialogSelectedId===cid && dayDialogDate!==newDate) dayDialogSelectedId=null; }
+    }
+    clickSuppress=true; setTimeout(()=>clickSuppress=false,0);
+    const dates=new Set([oldDate,newDate]);
+    dates.forEach(d=>compactLanes(dayObj(d).cards));
+    saveLocal(false);
+    dates.forEach(d=>rerenderDayViews(d));
+  } else if(st && (st.mode==='resize' || st.mode==='seam')){
+    clickSuppress=true; setTimeout(()=>clickSuppress=false,0);
+    compactLanes(dayObj(st.date).cards); rerenderDayViews(st.date);
+    saveLocal(false);
+  }
+  if(st) markCardDragging(st.cid,false);
+  removeMoveGhost();
+  hideDragTip();
+  document.body.classList.remove('resizing');
+  document.body.classList.remove('block-dragging');
+  miniDragState=null;
+}
+function startMiniLabelEdit(labelEl, card, date){
+  pushHistory();
+  const original=card.title||'';
+  labelEl.contentEditable='true'; labelEl.classList.add('editing');
+  labelEl.focus();
+  const sel=window.getSelection(); const range=document.createRange(); range.selectNodeContents(labelEl); sel.removeAllRanges(); sel.addRange(range);
+  function commit(){
+    labelEl.contentEditable='false'; labelEl.classList.remove('editing');
+    labelEl.removeEventListener('blur', commit);
+    labelEl.removeEventListener('keydown', onKey);
+    const newTitle=labelEl.textContent.trim()||original||'Untitled';
+    card.title=newTitle;
+    saveLocal(false); rerenderDayViews(date);
+  }
+  function cancel(){
+    labelEl.contentEditable='false'; labelEl.classList.remove('editing');
+    labelEl.removeEventListener('blur', commit);
+    labelEl.removeEventListener('keydown', onKey);
+    labelEl.textContent=original;
+  }
+  function onKey(e){ e.stopPropagation(); if(e.key==='Enter'){ e.preventDefault(); labelEl.blur(); } else if(e.key==='Escape'){ e.preventDefault(); cancel(); } }
+  labelEl.addEventListener('blur', commit, {once:true});
+  labelEl.addEventListener('keydown', onKey);
+}
+function handleMiniEditClick(e){
+  const btn=e.target.closest('.mini-edit-btn'); if(!btn) return;
+  e.preventDefault(); e.stopPropagation();
+  const block=btn.closest('.mini-block'); if(!block) return;
+  const date=block.dataset.date, cid=block.dataset.cid;
+  const day=dayObj(date); const card=day.cards.find(c=>c.id===cid); if(!card) return;
+  const label=block.querySelector('.mini-label'); if(!label) return;
+  startMiniLabelEdit(label, card, date);
+}
+function handleMiniClick(e){
+  if(clickSuppress || razorOn) return;
+  if(e.target.closest('.mini-seam')) return;
+  if(e.target.closest('.mini-gap-add')) return;
+  if(e.target.closest('.mini-handle')) return;
+  if(e.target.closest('.mini-edit-btn')) return;
+  if(e.target.closest('.mini-label.editing')) return;
+  const block=e.target.closest('.mini-block');
+  if(block){ openDayDialog(block.dataset.date, block.dataset.cid); return; }
+  const head=e.target.closest('.day-head');
+  if(head){ const dc=head.closest('.day-card'); if(dc) openDayDialog(dc.dataset.date, null); }
+}
+function renderDays(){
+  const daysEl=$('#days'); daysEl.innerHTML='';
+  const {start,days}=getTrip();
+  for(let i=0;i<days;i++){
+    const dt=new Date(start.getTime()+i*DAY); const date=fmtDate(dt);
+    dayObj(date);
+    const isEdge = days>1 && (i===0 || i===days-1); // trip days can only be trimmed from the ends
+    const card=document.createElement('article'); card.className='day-card'; card.dataset.date=date;
+    card.innerHTML=`<div class="day-head"><div class="date-num">${dt.getDate()}</div><div class="weekday">${dt.toLocaleDateString(undefined,{weekday:'short'})}</div>${isEdge?'<button type="button" class="day-del" title="Remove this day from the trip">✕</button>':''}</div><div class="mini-timeline compact" data-date="${date}"></div>`;
+    daysEl.appendChild(card);
+    if(isEdge){ $('.day-del',card).addEventListener('click', ev=>{ev.stopPropagation(); removeTripDay(i===0?'start':'end', date);}); }
+    const mini=$('.mini-timeline',card);
+    renderDayMiniTimeline(mini, date, COMPACT_DAY_PX, {compact:true});
+  }
+}
+function openDayDialog(date, cid){
+  dayDialogDate=date; dayDialogSelectedId=cid||null;
+  const d=parseDate(date+'T00:00');
+  $('#dayDialogTitle').textContent=d.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
+  $('#dayDialogOverlay').classList.add('open');
+  renderDialogTimeline();
+  renderDialogEditForm();
+}
+function closeDayDialog(){
+  $('#dayDialogOverlay').classList.remove('open');
+  dayDialogDate=null; dayDialogSelectedId=null;
+  render();
+}
+function renderDialogRuler(date){
+  const r=$('#dialogRuler'); r.innerHTML=''; r.style.height=DIALOG_DAY_PX+'px';
+  for(let h=0; h<24; h+=2){
+    const y=dayLocalX(DIALOG_DAY_PX, date, fmtDateTime(new Date(parseDate(date+'T00:00').getTime()+h*3600000)));
+    const t=document.createElement('div'); t.className='dtick'; t.style.top=y+'px'; t.textContent=String(h).padStart(2,'0')+':00';
+    r.appendChild(t);
+  }
+}
+function renderDialogTimeline(){
+  if(!dayDialogDate) return;
+  renderDialogRuler(dayDialogDate);
+  const c=$('#dialogTimeline'); c.style.width=DIALOG_LANE_PX+'px';
+  renderDayMiniTimeline(c, dayDialogDate, DIALOG_DAY_PX, {compact:false});
+}
+function renderDialogEditForm(){
+  const el=$('#dialogEditForm');
+  if(!dayDialogDate || !dayDialogSelectedId){ el.innerHTML='<div class="muted">Select an activity above to edit it, or use the + in an open slot to add one.</div>'; return; }
+  const day=dayObj(dayDialogDate); const card=day.cards.find(c=>c.id===dayDialogSelectedId);
+  if(!card){ dayDialogSelectedId=null; el.innerHTML='<div class="muted">That activity was removed.</div>'; return; }
+  el.innerHTML=`<div class="field text-plain"><label>Title</label><input id="cfTitle" value="${escapeHtml(card.title||'')}"></div><div class="field"><label>Color</label><div class="palette" id="cfColorPalette">${COLORS.map(c=>`<button type="button" class="swatch c-${c}${c===(card.color||'blue')?' selected':''}" data-color="${c}" title="${c}"></button>`).join('')}</div></div><div class="row"><div class="field"><label>Start</label><input id="cfStart" type="datetime-local" value="${card.start}"></div><div class="field"><label>End</label><input id="cfEnd" type="datetime-local" value="${card.end}"></div></div><div class="field text-plain"><label>Details</label><textarea id="cfBody">${escapeHtml(card.body||'')}</textarea></div><div class="row"><button id="cfDeleteBtn">Delete activity</button><button id="cfDuplicateBtn">Duplicate activity</button></div>`;
+  $$('#dialogEditForm input,#dialogEditForm textarea').forEach(inp=>inp.addEventListener('input', applyCardForm));
+  $$('.swatch',el).forEach(sw=>sw.addEventListener('click',()=>{pushHistory(); $$('.swatch',el).forEach(s=>s.classList.remove('selected')); sw.classList.add('selected'); applyCardForm();}));
+  $('#cfDeleteBtn').onclick=()=>{pushHistory(); const idx=day.cards.findIndex(c=>c.id===card.id); if(idx>-1) day.cards.splice(idx,1); compactLanes(day.cards); dayDialogSelectedId=null; saveLocal(false); renderDialogTimeline(); renderDialogEditForm(); rerenderDayViews(dayDialogDate);};
+  $('#cfDuplicateBtn').onclick=()=>{pushHistory(); const copy=structuredClone(card); copy.id=uid('card'); copy.title=(copy.title||'Untitled')+' copy'; copy.lane=findFreeLaneIn(day.cards,parseDate(copy.start),parseDate(copy.end),copy.id); day.cards.push(copy); dayDialogSelectedId=copy.id; saveLocal(false); renderDialogTimeline(); renderDialogEditForm(); rerenderDayViews(dayDialogDate);};
+}
+function applyCardForm(){
+  if(!dayDialogDate||!dayDialogSelectedId) return;
+  const day=dayObj(dayDialogDate); const card=day.cards.find(c=>c.id===dayDialogSelectedId); if(!card) return;
+  card.title=$('#cfTitle').value;
+  const sel=$('#dialogEditForm .swatch.selected'); if(sel) card.color=sel.dataset.color;
+  const sv=$('#cfStart').value, ev=$('#cfEnd').value;
+  if(sv && !isNaN(parseDate(sv))) card.start=sv;
+  if(ev && !isNaN(parseDate(ev))) card.end=ev;
+  card.body=$('#cfBody').value;
+  const oldDate=dayDialogDate, newDate=fmtDate(card.start);
+  saveLocal(false); // normalizeData re-buckets the card if its date changed
+  if(newDate!==oldDate){
+    dayDialogDate=newDate;
+    $('#dayDialogTitle').textContent=parseDate(newDate+'T00:00').toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
+    rerenderDayViews(oldDate);
+    toast('Moved to '+prettyDate(card.start)+'.');
+  }
+  renderDialogTimeline(); rerenderDayViews(dayDialogDate);
+}
+function renderActions(){const list=$('#actionsList'); if(!list) return; list.innerHTML=''; data.actionItems.forEach(item=>{const row=document.createElement('div'); row.className='action-item'+(item.done?' done':''); row.dataset.aid=item.id; row.draggable=false; row.innerHTML=`<span class="card-handle" title="Drag to reorder">⠿</span><input type="checkbox" ${item.done?'checked':''}><span class="action-text" contenteditable="true">${escapeHtml(item.text)}</span><button class="small-btn delete">✕</button>`; $('input[type=checkbox]',row).addEventListener('change',e=>{pushHistory(); item.done=e.target.checked; row.classList.toggle('done',item.done); saveLocal(false)}); $('.action-text',row).addEventListener('input',e=>{item.text=e.target.innerText; saveLocal(false)}); $('.delete',row).onclick=()=>{pushHistory(); const idx=data.actionItems.findIndex(x=>x.id===item.id); if(idx>-1) data.actionItems.splice(idx,1); saveLocal(false); renderActions()}; list.appendChild(row)})}
+function syncActionsFromDom(){const byId={}; data.actionItems.forEach(a=>byId[a.id]=a); const ids=$$('.action-item',$('#actionsList')).map(el=>el.dataset.aid); data.actionItems=ids.map(id=>byId[id]).filter(Boolean)}
+function addActionItem(){const input=$('#newActionText'); const text=input.value.trim(); if(!text)return; pushHistory(); data.actionItems.push({id:uid('a'),text,done:false}); input.value=''; saveLocal(false); renderActions()}
+function openItem(type,index){
+  const item=data[type][index]; if(!item) return;
+  activeEdit={type,index,id:item.id}; $('#panelTitle').textContent=item.name;
+  $('#panelForm').innerHTML=`<div class="field text-plain"><label>Name</label><input id="fName" value="${escapeHtml(item.name)}"></div><div class="field"><label>Color</label><div class="palette" id="fColorPalette">${COLORS.map(c=>`<button type="button" class="swatch c-${c}${c===(item.color||'blue')?' selected':''}" data-color="${c}" title="${c}"></button>`).join('')}</div></div>${type==='transport'?`<div class="field"><label>Mode</label><div class="palette" id="fModePalette">${TRANSPORT_MODES.map(m=>`<button type="button" class="mode-swatch${m.key===(item.mode||'plane')?' selected':''}" data-mode="${m.key}" title="${m.label}">${m.icon}</button>`).join('')}</div></div>`:''}<div class="row"><div class="field"><label>Start</label><input id="fStart" type="datetime-local" value="${item.start}"></div><div class="field"><label>End</label><input id="fEnd" type="datetime-local" value="${item.end}"></div></div>${type==='stays'?`<div class="field text-plain"><label>Address / stay label</label><input id="fAddress" value="${escapeHtml(item.address||'')}"></div>`:''}<div class="field text-plain"><label>Details</label><textarea id="fDetails">${escapeHtml(item.details||'')}</textarea></div><div class="row"><button id="deleteItemBtn">Delete block</button><button id="duplicateItemBtn">Duplicate block</button></div>`;
+  $('#panel').classList.add('open');
+  $$('#panelForm input,#panelForm textarea').forEach(input=>input.addEventListener('input',applyPanel));
+  $$('.swatch',$('#panelForm')).forEach(sw=>sw.addEventListener('click',()=>{pushHistory(); $$('.swatch',$('#panelForm')).forEach(s=>s.classList.remove('selected')); sw.classList.add('selected'); applyPanel();}));
+  $$('.mode-swatch',$('#panelForm')).forEach(sw=>sw.addEventListener('click',()=>{pushHistory(); $$('.mode-swatch',$('#panelForm')).forEach(s=>s.classList.remove('selected')); sw.classList.add('selected'); applyPanel();}));
+  $('#panelTitle').oninput=()=>{item.name=$('#panelTitle').innerText.trim(); renderBars(); syncRaw(false); saveLocal(false)};
+  $('#deleteItemBtn').onclick=()=>{pushHistory(); const idx=data[type].findIndex(x=>x.id===item.id); if(idx>-1) data[type].splice(idx,1); if(type==='stays') compactLanes(data.stays); closePanel(); saveLocal(false); render()};
+  $('#duplicateItemBtn').onclick=()=>{pushHistory(); const idx=data[type].findIndex(x=>x.id===item.id); const copy=structuredClone(item); copy.id=uid(type); copy.name+=' copy'; if(type==='stays'){copy.lane=findFreeLaneIn(data.stays,parseDate(copy.start),parseDate(copy.end),copy.id);} data[type].splice(idx+1,0,copy); saveLocal(false); render(); openItem(type,idx+1)};
+}
+function applyPanel(){
+  if(!activeEdit)return;
+  const arr=data[activeEdit.type]; if(!arr)return;
+  const idx=arr.findIndex(x=>x.id===activeEdit.id); if(idx<0){ closePanel(); return; }
+  activeEdit.index=idx;
+  const item=arr[idx];
+  item.name=$('#fName').value;
+  const sel=$('#panelForm .swatch.selected'); if(sel) item.color=sel.dataset.color;
+  const modeSel=$('#panelForm .mode-swatch.selected'); if(modeSel) item.mode=modeSel.dataset.mode;
+  const sv=$('#fStart').value, ev=$('#fEnd').value;
+  if(sv && !isNaN(parseDate(sv))) item.start=sv;
+  if(ev && !isNaN(parseDate(ev))) item.end=ev;
+  item.details=$('#fDetails').value;
+  if(activeEdit.type==='stays') item.address=$('#fAddress').value;
+  $('#panelTitle').textContent=item.name; saveLocal(false); renderBars(); syncRaw(false);
+}
+function closePanel(){activeEdit=null; $('#panel').classList.remove('open')}
+function syncRaw(updateTextarea=true){if(updateTextarea) $('#rawText').value=JSON.stringify(data,null,2); else if(!$('#drawer').classList.contains('open')) $('#rawText').value=JSON.stringify(data,null,2)}
+function applyRaw(){try{const parsed=JSON.parse($('#rawText').value); pushHistory(); data=normalizeData(parsed); saveLocal(false); render(); toast('Raw data applied.')}catch(e){toast('JSON error: '+e.message)}}
+function startResize(e){if(razorOn)return; const handle=e.target.closest('.handle'); if(!handle)return; const bar=e.target.closest('.bar'); if(!bar)return; e.preventDefault(); e.stopPropagation(); pushHistory(); dragState={type:bar.dataset.type,index:Number(bar.dataset.index),edge:handle.classList.contains('left')?'start':'end'}; document.body.classList.add('resizing'); bar.setPointerCapture(e.pointerId)}
+function onResize(e){if(!dragState)return; const board=$('#board'); const rect=board.getBoundingClientRect(); const x=e.clientX-rect.left; let t=quantize(timeForX(x)); const item=data[dragState.type][dragState.index]; const {prevEnd,nextStart}=getNeighborBounds(dragState.type,item); if(dragState.edge==='start'){if(t<prevEnd) t=new Date(prevEnd); if(t<parseDate(item.end)) item.start=fmtDateTime(t)}else{if(t>nextStart) t=new Date(nextStart); if(t>parseDate(item.start)) item.end=fmtDateTime(t)} showDragTip(e, prettyWindow(item.start,item.end)); saveLocal(false); renderBars(); if(activeEdit && activeEdit.type===dragState.type && activeEdit.id===item.id){const fs=$('#fStart'), fe=$('#fEnd'); if(fs) fs.value=item.start; if(fe) fe.value=item.end;}}
+function endResize(){if(dragState){clickSuppress=true; setTimeout(()=>clickSuppress=false,0); if(dragState.type==='stays'){compactLanes(data.stays); saveLocal(false); renderBars();}} hideDragTip(); dragState=null; document.body.classList.remove('resizing')}
+
+// --- Drag a location/transportation/lodging block by its body to shift start+end together (duration fixed, snapped to quantum) ---
+function startBarMove(e){
+  if(dragState || razorOn) return;
+  if(e.target.closest('.handle')) return;
+  if(e.target.closest('.gap-add')) return;
+  const bar=e.target.closest('.bar'); if(!bar) return;
+  const type=bar.dataset.type; if(type!=='locations' && type!=='transport' && type!=='stays') return;
+  const index=Number(bar.dataset.index); const item=data[type][index]; if(!item) return;
+  const durationMs=parseDate(item.end)-parseDate(item.start);
+  const bounds=getMoveBounds(type,item);
+  moveState={type,index,startClientX:e.clientX,originalStartX:xForTime(item.start),durationMs,lower:bounds.lower,upper:bounds.upper,moving:false,bar};
+}
+function onBarMove(e){
+  if(!moveState) return;
+  const dx=e.clientX-moveState.startClientX;
+  if(!moveState.moving){
+    if(Math.abs(dx)<6) return;
+    pushHistory();
+    moveState.moving=true; moveState.bar.classList.add('moving');
+    try{moveState.bar.setPointerCapture(e.pointerId)}catch(err){}
+    document.body.classList.add('resizing');
+  }
+  const item=data[moveState.type][moveState.index]; if(!item) return;
+  const newX=moveState.originalStartX+dx;
+  let newStart=quantize(timeForX(newX));
+  if(newStart<moveState.lower) newStart=new Date(moveState.lower);
+  if(newStart>moveState.upper) newStart=new Date(moveState.upper);
+  const newEnd=new Date(newStart.getTime()+moveState.durationMs);
+  item.start=fmtDateTime(newStart); item.end=fmtDateTime(newEnd);
+  showDragTip(e, prettyWindow(item.start,item.end));
+  saveLocal(false); renderBars();
+  const freshBar=$(`.bar[data-type="${moveState.type}"][data-index="${moveState.index}"]`, $('#board'));
+  if(freshBar){freshBar.classList.add('moving'); moveState.bar=freshBar;}
+  if(activeEdit && activeEdit.type===moveState.type && activeEdit.id===item.id){const fs=$('#fStart'), fe=$('#fEnd'); if(fs) fs.value=item.start; if(fe) fe.value=item.end;}
+}
+function endBarMove(){
+  if(moveState && moveState.moving){
+    clickSuppress=true; setTimeout(()=>clickSuppress=false,0); document.body.classList.remove('resizing');
+    if(moveState.type==='stays'){ compactLanes(data.stays); saveLocal(false); renderBars(); }
+  }
+  hideDragTip();
+  moveState=null;
+}
+function extendTrip(edge){
+  pushHistory();
+  const {col,gap}=getColGap();
+  if(edge==='start'){ data.tripStart=fmtDateTime(new Date(parseDate(data.tripStart).getTime()-DAY)); }
+  else { data.tripEnd=fmtDateTime(new Date(parseDate(data.tripEnd).getTime()+DAY)); }
+  saveLocal(false); render();
+  if(edge==='start'){ requestAnimationFrame(()=>{$('#scroller').scrollLeft+=(col+gap);}); }
+}
+function removeTripDay(edge, date){
+  const {days}=getTrip();
+  if(days<=1){ toast('The trip needs at least one day.'); return; }
+  const dayStart=parseDate(date+'T00:00'), dayEnd=new Date(dayStart.getTime()+DAY);
+  const bucket=data.dayCards.find(d=>d.date===date);
+  const hasContent=(bucket && bucket.cards.length>0) || ['locations','transport','stays'].some(t=>data[t].some(i=>parseDate(i.start)<dayEnd && parseDate(i.end)>dayStart));
+  if(hasContent && !confirm('This day has scheduled items — remove it anyway? Blocks reaching into it will be trimmed.')) return;
+  pushHistory();
+  if(edge==='start') data.tripStart=fmtDateTime(dayEnd); else data.tripEnd=fmtDateTime(dayStart);
+  const ts=parseDate(data.tripStart), te=parseDate(data.tripEnd);
+  ['locations','transport','stays'].forEach(t=>{
+    data[t]=data[t].filter(i=>parseDate(i.end)>ts && parseDate(i.start)<te);
+    data[t].forEach(i=>{ if(parseDate(i.start)<ts) i.start=fmtDateTime(ts); if(parseDate(i.end)>te) i.end=fmtDateTime(te); });
+  });
+  data.dayCards=data.dayCards.filter(d=>{ const t0=parseDate(d.date+'T00:00'); return t0>=ts && t0<te; });
+  compactLanes(data.stays);
+  saveLocal(false); render();
+  toast('Removed '+prettyDate(dayStart)+' from the trip.');
+}
+// ===== Drag tip: live time readout that follows the cursor during any drag =====
+function showDragTip(e,text){
+  let tip=$('#dragTip');
+  if(!tip){ tip=document.createElement('div'); tip.id='dragTip'; document.body.appendChild(tip); }
+  tip.textContent=text;
+  tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY-34)+'px';
+  tip.classList.add('on');
+}
+function hideDragTip(){ const tip=$('#dragTip'); if(tip) tip.classList.remove('on'); }
+
+// ===== Seam handles: grab the boundary between two touching blocks and move both edges at once =====
+let seamDragState=null;
+function makeSeamHandle(type, a, b, topPx, heightPx){
+  const sh=document.createElement('button'); sh.type='button'; sh.className='seam-handle';
+  sh.dataset.type=type; sh.dataset.prev=a.id; sh.dataset.next=b.id;
+  sh.style.left=xForTime(a.end)+'px'; sh.style.top=topPx+'px'; sh.style.height=heightPx+'px';
+  sh.title=`Drag to move the boundary between “${a.name}” and “${b.name}”`;
+  return sh;
+}
+function startSeamDrag(e){
+  const sh=e.target.closest('.seam-handle'); if(!sh || razorOn) return;
+  e.preventDefault(); e.stopPropagation();
+  pushHistory();
+  seamDragState={type:sh.dataset.type, prevId:sh.dataset.prev, nextId:sh.dataset.next};
+  document.body.classList.add('resizing');
+}
+function onSeamDrag(e){
+  if(!seamDragState) return;
+  const arr=data[seamDragState.type]; if(!arr) return;
+  const prev=arr.find(i=>i.id===seamDragState.prevId), next=arr.find(i=>i.id===seamDragState.nextId);
+  if(!prev||!next) return;
+  const rect=$('#board').getBoundingClientRect();
+  let t=quantize(timeForX(e.clientX-rect.left));
+  const q=(data.quantMinutes||30)*60000;
+  const lo=new Date(parseDate(prev.start).getTime()+q), hi=new Date(parseDate(next.end).getTime()-q);
+  if(t<lo) t=new Date(lo);
+  if(t>hi) t=new Date(hi);
+  prev.end=fmtDateTime(t); next.start=fmtDateTime(t);
+  showDragTip(e, `boundary → ${prettyDate(t)} ${prettyTime(t)}`);
+  saveLocal(false); renderBars();
+}
+function endSeamDrag(){
+  if(seamDragState){ clickSuppress=true; setTimeout(()=>clickSuppress=false,0); seamDragState=null; document.body.classList.remove('resizing'); hideDragTip(); }
+}
+
+// ===== Razor: slice a block into two at the snapped cut point =====
+let razorOn=false, razorHline=null;
+function setRazor(on){
+  razorOn=on;
+  document.body.classList.toggle('razor-mode', on);
+  const b=$('#razorBtn'); if(b) b.classList.toggle('active', on);
+  if(!on){ const l=$('#razorLine'); if(l) l.style.display='none'; if(razorHline&&razorHline.isConnected) razorHline.remove(); }
+}
+function splitLaneItem(type,index,t){
+  const item=data[type][index]; if(!item) return;
+  const q=(data.quantMinutes||30)*60000;
+  const s=parseDate(item.start), en=parseDate(item.end);
+  if(t-s<q || en-t<q){ toast('Too close to the edge to cut — aim nearer the middle.'); return; }
+  pushHistory();
+  const copy=structuredClone(item);
+  copy.id=uid(type==='locations'?'loc':type==='transport'?'trn':'s');
+  item.end=fmtDateTime(t); copy.start=fmtDateTime(t);
+  data[type].splice(index+1,0,copy);
+  saveLocal(false); render();
+  toast('Sliced into two blocks.');
+}
+function razorMiniClick(e){
+  if(!razorOn) return;
+  const block=e.target.closest('.mini-block'); if(!block) return;
+  e.stopPropagation(); e.preventDefault();
+  const container=block.closest('.mini-timeline'); if(!container) return;
+  const date=block.dataset.date;
+  const rect=container.getBoundingClientRect();
+  const t=quantize(dayLocalTime(container.clientHeight||COMPACT_DAY_PX, date, e.clientY-rect.top));
+  const day=dayObj(date); const card=day.cards.find(c=>c.id===block.dataset.cid); if(!card) return;
+  const q=(data.quantMinutes||30)*60000;
+  const s=parseDate(card.start), en=parseDate(card.end);
+  if(t-s<q || en-t<q){ toast('Too close to the edge to cut — aim nearer the middle.'); return; }
+  pushHistory();
+  const copy=structuredClone(card); copy.id=uid('card');
+  card.end=fmtDateTime(t); copy.start=fmtDateTime(t);
+  day.cards.push(copy);
+  saveLocal(false); rerenderDayViews(date);
+  toast('Sliced into two activities.');
+}
+function razorMiniMove(e){
+  if(!razorOn) return;
+  if(!razorHline){ razorHline=document.createElement('div'); razorHline.className='razor-hline'; }
+  const block=e.target.closest('.mini-block');
+  if(!block){ if(razorHline.isConnected) razorHline.remove(); return; }
+  const container=block.closest('.mini-timeline'); if(!container) return;
+  const rect=container.getBoundingClientRect();
+  const t=quantize(dayLocalTime(container.clientHeight||COMPACT_DAY_PX, block.dataset.date, e.clientY-rect.top));
+  container.appendChild(razorHline);
+  razorHline.style.top=dayLocalX(container.clientHeight||COMPACT_DAY_PX, block.dataset.date, fmtDateTime(t))+'px';
+}
+
+// ===== Long blocks: keep the label inside the visible part of the bar =====
+function updateBarLabels(){
+  const scroller=$('#scroller'); if(!scroller||!scroller.clientWidth) return;
+  const padLeft=parseFloat(getComputedStyle(scroller).paddingLeft)||0;
+  const viewL=scroller.scrollLeft-padLeft, viewR=viewL+scroller.clientWidth;
+  $$('.bar', $('#board')).forEach(bar=>{
+    const label=bar.querySelector('.bar-label'); if(!label) return;
+    const sub=bar.querySelector('.bar-sub');
+    const w=bar.offsetWidth;
+    if(w<420){ label.style.transform=''; if(sub) sub.style.transform=''; return; }
+    const left=parseFloat(bar.style.left)||0;
+    const visL=Math.max(left,viewL), visR=Math.min(left+w,viewR);
+    if(visR<=visL){ label.style.transform=''; if(sub) sub.style.transform=''; return; }
+    let off=(visL+visR)/2-(left+w/2);
+    const maxOff=Math.max(0,(w-(label.offsetWidth||0))/2-34);
+    if(off>maxOff) off=maxOff; if(off<-maxOff) off=-maxOff;
+    label.style.transform=`translateX(${off}px)`;
+    if(sub){ const mo=Math.max(0,(w-(sub.offsetWidth||0))/2-34); sub.style.transform=`translateX(${Math.max(-mo,Math.min(mo,off))}px)`; }
+  });
+}
+
+// ===== Docked text view open/close (keeps the playhead time stable through the relayout) =====
+function setTextDock(open){
+  const dock=$('#textDrawer'); if(!dock) return;
+  if(dock.classList.contains('open')===open) return;
+  const dt=currentPlayheadTime();
+  dock.classList.toggle('open', open);
+  updateScrollerEdgePad();
+  scrollPlayheadTo(dt, true);
+  if(open) refreshTextView();
+  updatePlayheadReadout();
+}
+
+$('#board').addEventListener('pointerdown',startSeamDrag); window.addEventListener('pointermove',onSeamDrag); window.addEventListener('pointerup',endSeamDrag); window.addEventListener('pointercancel',endSeamDrag);
+$('#board').addEventListener('pointermove', e=>{
+  if(!razorOn) return;
+  let line=$('#razorLine');
+  if(!line){ line=document.createElement('div'); line.id='razorLine'; $('#board').appendChild(line); }
+  const bar=e.target.closest('.bar');
+  if(!bar){ line.style.display='none'; return; }
+  const boardRect=$('#board').getBoundingClientRect();
+  const t=quantize(timeForX(e.clientX-boardRect.left));
+  const barRect=bar.getBoundingClientRect();
+  line.style.display='block';
+  line.style.left=xForTime(t)+'px';
+  line.style.top=(barRect.top-boardRect.top-4)+'px';
+  line.style.height=(barRect.height+8)+'px';
+});
+$('#board').addEventListener('click', e=>{
+  if(!razorOn) return;
+  const bar=e.target.closest('.bar'); if(!bar) return;
+  e.stopPropagation(); e.preventDefault();
+  const rect=$('#board').getBoundingClientRect();
+  splitLaneItem(bar.dataset.type, Number(bar.dataset.index), quantize(timeForX(e.clientX-rect.left)));
+}, true);
+$('#days').addEventListener('click', razorMiniClick, true);
+$('#dialogTimeline').addEventListener('click', razorMiniClick, true);
+$('#days').addEventListener('pointermove', razorMiniMove);
+$('#dialogTimeline').addEventListener('pointermove', razorMiniMove);
+$('#razorBtn').onclick=()=>setRazor(!razorOn);
+function statusLineActivate(e){
+  const line=e.target.closest('[data-kind]'); if(!line) return;
+  if(line.dataset.kind==='lane'){
+    const type=line.dataset.type; const idx=data[type].findIndex(i=>i.id===line.dataset.id);
+    if(idx>-1) openItem(type, idx);
+  } else if(line.dataset.kind==='card'){
+    openDayDialog(line.dataset.date, line.dataset.id);
+  }
+}
+$('#playheadStatus').addEventListener('click', statusLineActivate);
+$('#playheadHud').addEventListener('click', e=>{ if(e.target.closest('#playheadDetails')) statusLineActivate(e); });
+$('#homeTimesBtn').onclick=()=>{ showHomeTimes=!showHomeTimes; $('#homeTimesBtn').classList.toggle('active',showHomeTimes); updatePlayheadReadout(); };
+$('#nowBtn').onclick=()=>{
+  const now=new Date(); const s=parseDate(data.tripStart), en=parseDate(data.tripEnd);
+  if(now<s){ scrollPlayheadTo(s); toast("Trip hasn't started yet — jumped to the start."); }
+  else if(now>en){ scrollPlayheadTo(en); toast('Trip is over — jumped to the end.'); }
+  else { scrollPlayheadTo(now); }
+};
+
+// ===== Zoom: scales the px-per-day (--col) and day gap; all geometry flows through getColGap() =====
+const BASE_COL=318, BASE_GAP=12;
+let zoom=1;
+try{ const z=parseFloat(localStorage.getItem('editableTripTimeline.zoom')); if(z>=0.4 && z<=2.6) zoom=z; }catch(e){}
+function setZoomVars(){
+  document.documentElement.style.setProperty('--col', Math.round(BASE_COL*zoom)+'px');
+  document.documentElement.style.setProperty('--gap', Math.max(4,Math.round(BASE_GAP*zoom))+'px');
+  const zl=$('#zoomLabel'); if(zl) zl.textContent=Math.round(zoom*100)+'%';
+}
+function applyZoom(newZoom){
+  const dt=currentPlayheadTime(); // hold the moment under the playhead steady through the zoom
+  zoom=Math.max(0.4, Math.min(2.6, newZoom));
+  try{ localStorage.setItem('editableTripTimeline.zoom', String(zoom)); }catch(e){}
+  setZoomVars();
+  render();
+  scrollPlayheadTo(dt, true);
+}
+$('#zoomInBtn').onclick=()=>applyZoom(zoom*1.25);
+$('#zoomOutBtn').onclick=()=>applyZoom(zoom/1.25);
+$('#zoomLabel').onclick=()=>applyZoom(1);
+
+$('#board').addEventListener('pointerdown',startResize); $('#board').addEventListener('pointerdown',startBarMove); window.addEventListener('pointermove',onResize); window.addEventListener('pointermove',onBarMove); window.addEventListener('pointerup',endResize); window.addEventListener('pointerup',endBarMove); window.addEventListener('pointercancel',endResize); window.addEventListener('pointercancel',endBarMove);
+$('#addDayStartBtn').onclick=()=>extendTrip('start'); $('#addDayEndBtn').onclick=()=>extendTrip('end');
+
+// --- Activity mini-block resize/move (compact day cards + day dialog share the same handlers) ---
+$('#days').addEventListener('pointerdown', startMiniInteraction);
+$('#dialogTimeline').addEventListener('pointerdown', startMiniInteraction);
+window.addEventListener('pointermove', onMiniInteraction);
+window.addEventListener('pointerup', endMiniInteraction);
+window.addEventListener('pointercancel', endMiniInteraction);
+$('#days').addEventListener('click', handleMiniClick);
+$('#days').addEventListener('click', handleMiniEditClick);
+$('#dialogTimeline').addEventListener('click', handleMiniEditClick);
+$('#dialogTimeline').addEventListener('click', e=>{
+  if(clickSuppress || razorOn) return;
+  if(e.target.closest('.mini-seam')) return;
+  if(e.target.closest('.mini-gap-add')) return;
+  if(e.target.closest('.mini-handle')) return;
+  if(e.target.closest('.mini-edit-btn')) return;
+  if(e.target.closest('.mini-label.editing')) return;
+  const block=e.target.closest('.mini-block');
+  if(block){ dayDialogSelectedId=block.dataset.cid; renderDialogTimeline(); renderDialogEditForm(); }
+});
+$('#closeDayDialogBtn').onclick=closeDayDialog;
+$('#dayDialogOverlay').addEventListener('click', e=>{ if(e.target.id==='dayDialogOverlay') closeDayDialog(); });
+
+// --- Action item drag & drop (event delegation on #actionsList) ---
+$('#actionsList').addEventListener('pointerdown', e=>{const handle=e.target.closest('.card-handle'); if(!handle)return; const row=handle.closest('.action-item'); if(row){ pushHistory(); row.draggable=true; }});
+$('#actionsList').addEventListener('dragstart', e=>{const row=e.target.closest('.action-item'); if(!row)return; row.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain', row.dataset.aid);});
+$('#actionsList').addEventListener('dragover', e=>{const dragging=$('#actionsList').querySelector('.action-item.dragging'); if(!dragging)return; e.preventDefault(); const after=getDragAfterElement($('#actionsList'), e.clientY, '.action-item:not(.dragging)'); if(after==null){$('#actionsList').appendChild(dragging);}else{$('#actionsList').insertBefore(dragging, after);}});
+$('#actionsList').addEventListener('dragend', e=>{const row=e.target.closest('.action-item'); if(!row)return; row.draggable=false; row.classList.remove('dragging'); syncActionsFromDom(); saveLocal(false);});
+
+// Safety net: if a handle-press never turns into an actual drag, clear the draggable flag so text selection keeps working normally.
+window.addEventListener('pointerup', ()=>{$$('.action-item[draggable="true"]').forEach(c=>c.draggable=false);});
+
+$('#tripTitle').addEventListener('input',()=>{data.title=$('#tripTitle').innerText.trim()||'Trip Itinerary'; saveLocal(false); syncRaw(false)}); $('#closePanel').onclick=closePanel; $('#dataBtn').onclick=()=>{$('#actionsDrawer').classList.remove('open'); $('#drawer').classList.toggle('open'); syncRaw(true)}; $('#closeDrawerBtn').onclick=()=>$('#drawer').classList.remove('open'); $('#applyRawBtn').onclick=applyRaw; $('#formatRawBtn').onclick=()=>{try{$('#rawText').value=JSON.stringify(JSON.parse($('#rawText').value),null,2)}catch(e){toast('JSON error: '+e.message)}}; $('#saveLocalBtn').onclick=()=>saveLocal(true); $('#leftBtn').onclick=()=>$('#scroller').scrollBy({left:-700,behavior:'smooth'}); $('#rightBtn').onclick=()=>$('#scroller').scrollBy({left:700,behavior:'smooth'});
+$('#actionsBtn').onclick=()=>{$('#drawer').classList.remove('open'); $('#actionsDrawer').classList.toggle('open'); renderActions();}; $('#closeActionsBtn').onclick=()=>$('#actionsDrawer').classList.remove('open'); $('#addActionBtn').onclick=addActionItem; $('#newActionText').addEventListener('keydown', e=>{if(e.key==='Enter'){e.preventDefault(); addActionItem();}});
+$('#textViewBtn').onclick=()=>{$('#drawer').classList.remove('open'); $('#actionsDrawer').classList.remove('open'); setTextDock(!$('#textDrawer').classList.contains('open'));};
+$('#closeTextBtn').onclick=()=>setTextDock(false);
+$('#printTextBtn').onclick=()=>{ setTextDock(true); refreshTextView(); setTimeout(()=>window.print(), 80); };
+['wheel','pointerdown','touchmove','keydown'].forEach(ev=>$('#textViewArea').addEventListener(ev,()=>{tvPauseUntil=Date.now()+4000;},{passive:true}));
+$('#copyTextBtn').onclick=async()=>{const val=buildText(); try{await navigator.clipboard.writeText(val); toast('Copied to clipboard.');}catch(err){const t=document.createElement('textarea'); t.value=val; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); toast('Copied to clipboard.');}};
+$('#downloadTextBtn').onclick=()=>{const blob=new Blob([buildText()],{type:'text/plain'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='itinerary.txt'; a.click(); URL.revokeObjectURL(a.href);};
+$('#scroller').addEventListener('scroll', updatePlayheadReadout);
+$('#downloadBtn').onclick=()=>{const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='itinerary-data.json'; a.click(); URL.revokeObjectURL(a.href)}; $('#uploadInput').onchange=async e=>{const file=e.target.files[0]; if(!file)return; pushHistory(); data=normalizeData(JSON.parse(await file.text())); saveLocal(false); render(); toast('Uploaded JSON applied.')}; $('#resetBtn').onclick=()=>{if(confirm('Reset to built-in example? This overwrites local edits.')){pushHistory(); data=structuredClone(DEFAULT_DATA); saveLocal(false); render(); toast('Reset example loaded.')}};
+$('#undoBtn').onclick=undo; $('#redoBtn').onclick=redo;
+$('#editModeToggle').addEventListener('change', applyEditMode);
+document.addEventListener('focusin', e=>{
+  if(e.target.closest('#panelForm input, #panelForm textarea, #panelTitle, #dialogEditForm input, #dialogEditForm textarea, #actionsList .action-text, #tripTitle')){ pushHistory(); }
+});
+$('#scroller').addEventListener('wheel',e=>{if(e.ctrlKey||e.metaKey){e.preventDefault(); applyZoom(zoom*(e.deltaY<0?1.15:1/1.15)); return;} if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){e.currentTarget.scrollLeft+=e.deltaY; e.preventDefault()}},{passive:false}); let down=false,startX=0,startLeft=0,dragged=false; $('#scroller').addEventListener('pointerdown',e=>{if(e.target.closest('button')||e.target.closest('[contenteditable=true]')||e.target.closest('input')||e.target.closest('textarea')||e.target.closest('select')||e.target.closest('.handle')||e.target.closest('.card-handle')||e.target.closest('.bar')||e.target.closest('.mini-block')||e.target.closest('.day-card'))return; down=true; dragged=false; startX=e.clientX; startLeft=$('#scroller').scrollLeft}); $('#scroller').addEventListener('pointermove',e=>{if(!down||dragState||moveState||miniDragState)return; const dx=e.clientX-startX; if(!dragged&&Math.abs(dx)<8)return; dragged=true; $('#scroller').classList.add('dragging'); $('#scroller').scrollLeft=startLeft-dx}); window.addEventListener('pointerup',()=>{down=false; dragged=false; $('#scroller').classList.remove('dragging')});
+window.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closePanel(); setRazor(false); $('#drawer').classList.remove('open'); $('#actionsDrawer').classList.remove('open'); setTextDock(false); if(dayDialogDate) closeDayDialog(); return;}
+  if(e.key==='ArrowLeft'||e.key==='ArrowRight'){
+    const ae=document.activeElement; if(ae && (ae.tagName==='INPUT'||ae.tagName==='TEXTAREA'||ae.isContentEditable)) return;
+    e.preventDefault();
+    const stepMs=e.shiftKey?6*3600000:(data.quantMinutes||30)*60000;
+    scrollPlayheadTo(new Date(currentPlayheadTime().getTime()+(e.key==='ArrowRight'?stepMs:-stepMs)), true);
+    return;
+  }
+  const mod=e.ctrlKey||e.metaKey; if(!mod) return;
+  const ae=document.activeElement; const inTextField = ae && (ae.tagName==='INPUT' || ae.tagName==='TEXTAREA' || ae.isContentEditable);
+  if(inTextField) return;
+  const k=e.key.toLowerCase();
+  if(k==='z' && !e.shiftKey){ e.preventDefault(); undo(); }
+  else if((k==='z' && e.shiftKey) || k==='y'){ e.preventDefault(); redo(); }
+  else if(k==='=' || k==='+'){ e.preventDefault(); applyZoom(zoom*1.25); }
+  else if(k==='-'){ e.preventDefault(); applyZoom(zoom/1.25); }
+  else if(k==='0'){ e.preventDefault(); applyZoom(1); }
+});
+let resizeTimer=null;
+window.addEventListener('resize', ()=>{ clearTimeout(resizeTimer); resizeTimer=setTimeout(()=>{ updateScrollerEdgePad(); render(); }, 150); });
+try{ if(localStorage.getItem('editableTripTimeline.editMode')==='0'){ $('#editModeToggle').checked=false; } }catch(e){}
+applyEditMode();
+// One-time startup repair: collapse any lanes left stranded from an earlier session (e.g. a card that
+// briefly overlapped another mid-drag and got stuck in lane 1 forever, even after being moved apart again).
+normalizeData(data);
+data.dayCards.forEach(day=>compactLanes(day.cards));
+compactLanes(data.stays);
+setZoomVars();
+updateScrollerEdgePad();
+render(); saveLocal(false); updateUndoRedoButtons();
+</script>
+</body>
+</html>
